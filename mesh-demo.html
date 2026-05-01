@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesh Gradient — Background Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" rel="stylesheet"></noscript>
+  <style>
+    @font-face {
+      font-family: 'Little Character';
+      src: url('fonts/LittleCharacter-Regular.ttf') format('truetype');
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { overflow: hidden; background: #FFF3E5; }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      pointer-events: none;
+    }
+    h1 {
+      font-family: 'Little Character', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      color: #1a1a1a;
+      text-align: center;
+      line-height: 1.1;
+    }
+    p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      opacity: 0.6;
+    }
+    a {
+      pointer-events: all;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      text-decoration: none;
+      border: 1.5px solid rgba(26,26,26,0.4);
+      padding: 0.6rem 1.2rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    a:hover { border-color: #e03b22; color: #e03b22; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="overlay">
+    <p>Background Preview</p>
+    <h1>Christopher Howat</h1>
+    <a href="index.html">← Back to portfolio</a>
+  </div>
+  <script>
+    const VERT = `#version 300 es
+out vec2 v_uv;
+void main() {
+  vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
+  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+  v_uv = gl_Position.xy * 0.5;
+}`;
+
+    const FRAG = `#version 300 es
+precision mediump float;
+#define TWO_PI 6.28318530718
+#define PI 3.14159265358979323846
+
+uniform float u_time;
+uniform vec4 u_colors[10];
+uniform float u_colorsCount;
+uniform float u_distortion;
+uniform float u_swirl;
+uniform float u_grainMixer;
+uniform float u_grainOverlay;
+
+in vec2 v_uv;
+out vec4 fragColor;
+
+vec2 rotate(vec2 uv, float th) {
+  return mat2(cos(th), sin(th), -sin(th), cos(th)) * uv;
+}
+
+float hash21(vec2 p) {
+  p = fract(p * vec2(0.3183099, 0.3678794)) + 0.1;
+  p += dot(p, p + 19.19);
+  return fract(p.x * p.y);
+}
+
+float valueNoise(vec2 st) {
+  vec2 i = floor(st);
+  vec2 f = fract(st);
+  float a = hash21(i);
+  float b = hash21(i + vec2(1.0, 0.0));
+  float c = hash21(i + vec2(0.0, 1.0));
+  float d = hash21(i + vec2(1.0, 1.0));
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+vec2 getPosition(int i, float t) {
+  float a = float(i) * 0.37;
+  float b = 0.6 + fract(float(i) / 3.0) * 0.9;
+  float c = 0.8 + fract(float(i + 1) / 4.0);
+  return 0.5 + 0.5 * vec2(sin(t * b + a), cos(t * c + a * 1.5));
+}
+
+void main() {
+  vec2 uv = v_uv + 0.5;
+  vec2 grainUV = uv * 1000.0;
+
+  float grain = valueNoise(grainUV);
+  float mixerGrain = 0.4 * u_grainMixer * (grain - 0.5);
+
+  float t = 0.5 * (u_time + 41.5);
+
+  float radius = smoothstep(0.0, 1.0, length(uv - 0.5));
+  float center = 1.0 - radius;
+
+  for (float i = 1.0; i <= 2.0; i++) {
+    uv.x += u_distortion * center / i * sin(t + i * 0.4 * smoothstep(0.0, 1.0, uv.y)) * cos(0.2 * t + i * 2.4 * smoothstep(0.0, 1.0, uv.y));
+    uv.y += u_distortion * center / i * cos(t + i * 2.0 * smoothstep(0.0, 1.0, uv.x));
+  }
+
+  vec2 uvR = uv - 0.5;
+  float angle = 3.0 * u_swirl * radius;
+  uvR = rotate(uvR, -angle);
+  uvR += 0.5;
+
+  vec3 color = vec3(0.0);
+  float opacity = 0.0;
+  float totalWeight = 0.0;
+
+  for (int i = 0; i < 10; i++) {
+    if (i >= int(u_colorsCount)) break;
+    vec2 pos = getPosition(i, t) + mixerGrain;
+    vec3 cf = u_colors[i].rgb * u_colors[i].a;
+    float of = u_colors[i].a;
+    float dist = pow(length(uvR - pos), 3.5);
+    float w = 1.0 / (dist + 1e-3);
+    color += cf * w;
+    opacity += of * w;
+    totalWeight += w;
+  }
+
+  color /= max(1e-4, totalWeight);
+  opacity /= max(1e-4, totalWeight);
+
+  float go = valueNoise(rotate(grainUV, 1.0) + vec2(3.0));
+  go = mix(go, valueNoise(rotate(grainUV, 2.0) + vec2(-1.0)), 0.5);
+  go = pow(go, 1.3);
+  float gov = go * 2.0 - 1.0;
+  float gs = pow(u_grainOverlay * abs(gov), 0.8);
+  color = mix(color, vec3(step(0.0, gov)), 0.35 * gs);
+  opacity = clamp(opacity + 0.5 * gs, 0.0, 1.0);
+
+  fragColor = vec4(color, opacity);
+}`;
+
+    function hexToVec4(hex) {
+      hex = hex.replace('#', '');
+      const r = parseInt(hex.slice(0, 2), 16) / 255;
+      const g = parseInt(hex.slice(2, 4), 16) / 255;
+      const b = parseInt(hex.slice(4, 6), 16) / 255;
+      return [r, g, b, 1.0];
+    }
+
+    const canvas = document.getElementById('c');
+    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false });
+
+    function compile(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s);
+      return s;
+    }
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    const uTime       = gl.getUniformLocation(prog, 'u_time');
+    const uColorsCount = gl.getUniformLocation(prog, 'u_colorsCount');
+    const uDistortion = gl.getUniformLocation(prog, 'u_distortion');
+    const uSwirl      = gl.getUniformLocation(prog, 'u_swirl');
+    const uGrainMix   = gl.getUniformLocation(prog, 'u_grainMixer');
+    const uGrainOv    = gl.getUniformLocation(prog, 'u_grainOverlay');
+
+    // Portfolio-toned colour palette — cream, rose, red, warm tan
+    const palette = [
+      '#FFF3E5',  // cream
+      '#e03b22',  // red
+      '#f5c4b5',  // blush
+      '#c4321d',  // deep red
+    ];
+
+    palette.forEach((hex, i) => {
+      const loc = gl.getUniformLocation(prog, `u_colors[${i}]`);
+      gl.uniform4fv(loc, hexToVec4(hex));
+    });
+    gl.uniform1f(uColorsCount, palette.length);
+    gl.uniform1f(uDistortion, 0.65);
+    gl.uniform1f(uSwirl, 0.15);
+    gl.uniform1f(uGrainMix, 0.0);
+    gl.uniform1f(uGrainOv, 0.0);
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const start = performance.now();
+    function loop(now) {
+      gl.uniform1f(uTime, (now - start) / 1000);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>

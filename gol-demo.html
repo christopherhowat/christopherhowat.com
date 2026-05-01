@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game of Life</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #FFF3E5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 1.5rem;
+      font-family: 'Space Mono', monospace;
+    }
+    p {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: #8a7b6a;
+      text-transform: uppercase;
+    }
+    canvas {
+      display: block;
+      border: 1px solid #e0d5c5;
+    }
+  </style>
+</head>
+<body>
+  <p>Gosper Glider Gun — Conway's Game of Life</p>
+
+  <canvas
+    data-gol
+    data-cols="80"
+    data-rows="50"
+    data-cell-size="10"
+    data-speed-ms="80"
+    data-color="224,59,34"
+  ></canvas>
+
+  <script src="game-of-life.js"></script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>

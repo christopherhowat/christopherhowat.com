@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MH4YEG8SJZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MH4YEG8SJZ');
+  </script>
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gold Seal Homecare — Christopher Howat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap"></noscript>
+  <link rel="stylesheet" href="project.css">
+  <style>
+    /* Photography grid — landscape photos get a wider cell */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .photo-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .photo-grid .cell {
+      /* natural height */
+    }
+
+    .photo-grid .cell.full {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+      .photo-grid { grid-template-columns: 1fr; }
+      .photo-grid .cell.full { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#about" class="nav-link">About</a>
+    <a href="index.html#projects" class="nav-link active">Work</a>
+    <a href="index.html#experience" class="nav-link">Experience</a>
+    <a href="index.html#contact" class="nav-link">Contact</a>
+  </nav>
+
+  <div class="project-page">
+
+    <a href="index.html#projects" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      All Projects
+    </a>
+
+    <div class="project-header">
+      <p class="project-eyebrow">Graphic Design · Photography · Webflow · SEO</p>
+      <h1 class="project-title">Gold Seal Homecare</h1>
+      <div class="project-meta">
+        <span class="meta-tag">Graphic Design</span>
+        <span class="meta-tag">Photography</span>
+        <span class="meta-tag">Social Media</span>
+        <span class="meta-tag">Webflow</span>
+        <span class="meta-tag">SEO</span>
+      </div>
+    </div>
+
+    <!-- ── Graphic Design ─────────────────────────────────── -->
+    <h2 style="font-family:'Little Character',sans-serif; font-size:1.6rem; color:var(--red); margin-bottom:1rem;">Graphic Design</h2>
+
+    <div class="gallery">
+      <div class="gallery-item">
+        <img src="images/gs-design-1.webp" alt="Gold Seal social media design" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="images/gs-design-2.webp" alt="Gold Seal social media design" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="images/gs-august-sale.webp" alt="Gold Seal August Sale" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="images/gs-black-friday.webp" alt="Gold Seal Black Friday promotion" loading="lazy">
+      </div>
+    </div>
+
+    <div class="gallery" style="margin-top:1rem;">
+      <div class="gallery-item">
+        <img src="images/gs-testimonial.webp" alt="Gold Seal testimonial post" loading="lazy">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── Photography ───────────────────────────────────── -->
+    <h2 style="font-family:'Little Character',sans-serif; font-size:1.6rem; color:var(--red); margin-bottom:1rem;">Photography</h2>
+
+    <div class="photo-grid">
+      <div class="cell full">
+        <img src="images/gs-photo-DSC00181.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC00341.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC01553.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC01871.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC01904.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell full">
+        <img src="images/gs-photo-DSC01957.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC02006.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC09377.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC09383.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/gs-photo-DSC09420.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+      <div class="cell full">
+        <img src="images/gs-photo-DSC09422.webp" alt="Gold Seal photography" loading="lazy">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── Website ───────────────────────────────────────── -->
+    <h2 style="font-family:'Little Character',sans-serif; font-size:1.6rem; color:var(--red); margin-bottom:1rem;">Website</h2>
+
+    <video
+      src="images/gs-website.mp4"
+      autoplay
+      muted
+      loop
+      playsinline
+      style="width:100%; display:block; border:1px solid var(--border);"
+    ></video>
+
+    <div class="project-desc">
+      <h2>About the project</h2>
+      <p>
+        At Gold Seal Homecare, I helped shape the company's visual output across
+        both design and photography, working to give the brand a more consistent
+        and modern presence across digital channels.
+      </p>
+      <p>
+        A large part of the work focused on graphic design for campaigns and social
+        content. This included promotional assets, seasonal offers, and branded posts
+        designed to support ongoing marketing activity and strengthen how the company
+        presented itself online.
+      </p>
+      <p>
+        Alongside design work, I produced photography for the brand, capturing staff,
+        services, and general brand imagery. This helped build a reusable visual
+        library that could be drawn from across campaigns and day-to-day marketing.
+      </p>
+      <p>
+        I also maintained and developed the company website, making ongoing updates
+        in Webflow to improve layout, structure, and clarity. As part of this, I
+        worked on refining on-page content and SEO elements so that pages were better
+        structured for search visibility and easier for users to navigate.
+      </p>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2026 Christopher Howat</span>
+    <span>Glasgow, Scotland</span>
+  </footer>
+
+  <script src="trail.js"></script>
+  <script src="lightbox.js"></script>
+  <script src="grain.js"></script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>

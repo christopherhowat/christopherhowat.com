@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MH4YEG8SJZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MH4YEG8SJZ');
+  </script>
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Photography — Christopher Howat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap"></noscript>
+  <link rel="stylesheet" href="project.css">
+  <style>
+    .photo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .photo-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .photo-grid .cell.full {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+      .photo-grid { grid-template-columns: 1fr; }
+      .photo-grid .cell.full { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#about" class="nav-link">About</a>
+    <a href="index.html#projects" class="nav-link active">Work</a>
+    <a href="index.html#experience" class="nav-link">Experience</a>
+    <a href="index.html#contact" class="nav-link">Contact</a>
+  </nav>
+
+  <div class="project-page">
+
+    <a href="index.html#projects" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      All Projects
+    </a>
+
+    <div class="project-header">
+      <p class="project-eyebrow">Photography · Personal</p>
+      <h1 class="project-title">Personal Photography</h1>
+      <div class="project-meta">
+        <span class="meta-tag">Photography</span>
+        <span class="meta-tag">Personal</span>
+      </div>
+    </div>
+
+    <div class="photo-grid">
+      <div class="cell full">
+        <img src="images/photo-dsc01149-3.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc00063.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc00106-2.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell full">
+        <img src="images/photo-dsc01131.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc01136.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc01280.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc01336.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc01346.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell full">
+        <img src="images/photo-dsc02561-2.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc02231.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc02390.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc02394.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc02492.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell full">
+        <img src="images/photo-dsc09228.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc02507.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc02529.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc03883.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc07990.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc08088.webp" alt="Personal photography" loading="lazy">
+      </div>
+      <div class="cell">
+        <img src="images/photo-dsc08176.webp" alt="Personal photography" loading="lazy">
+      </div>
+    </div>
+
+    <div class="project-desc">
+      <h2>About the project</h2>
+      <p>
+        Personal shots taken on a Sony camera. Friends, landscapes, trips, and things
+        that caught my eye.
+      </p>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2026 Christopher Howat</span>
+    <span>Glasgow, Scotland</span>
+  </footer>
+
+  <script src="trail.js"></script>
+  <script src="lightbox.js"></script>
+  <script src="grain.js"></script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>

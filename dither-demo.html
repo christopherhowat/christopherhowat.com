@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dither — Background Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" rel="stylesheet"></noscript>
+  <style>
+    @font-face {
+      font-family: 'Little Character';
+      src: url('fonts/LittleCharacter-Regular.ttf') format('truetype');
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { overflow: hidden; background: #FFFAE5; }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+    .overlay {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.5rem; pointer-events: none;
+    }
+    h1 {
+      font-family: 'Little Character', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      color: #1a1a1a; text-align: center; line-height: 1.1;
+    }
+    p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #1a1a1a; opacity: 0.6;
+    }
+    a {
+      pointer-events: all;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #1a1a1a;
+      text-decoration: none; border: 1.5px solid rgba(26,26,26,0.4);
+      padding: 0.6rem 1.2rem; transition: border-color 0.2s, color 0.2s;
+    }
+    a:hover { border-color: #e03b22; color: #e03b22; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="overlay">
+    <p>Background Preview</p>
+    <h1>Christopher Howat</h1>
+    <a href="index.html">← Back to portfolio</a>
+  </div>
+  <script>
+    const VERT = `#version 300 es
+layout(location=0) in vec4 a_position;
+void main() { gl_Position = a_position; }`;
+
+    const FRAG = `#version 300 es
+precision mediump float;
+#define PI  3.14159265358979
+#define TWO_PI 6.28318530718
+
+uniform float u_time;
+uniform vec2  u_resolution;
+uniform float u_pixelRatio;
+uniform vec4  u_colorBack;
+uniform vec4  u_colorFront;
+uniform float u_pxSize;
+uniform float u_offsetX;
+uniform float u_offsetY;
+
+out vec4 fragColor;
+
+const int bayer4x4[16] = int[16](
+  0, 8, 2,10,
+ 12, 4,14, 6,
+  3,11, 1, 9,
+ 15, 7,13, 5
+);
+
+float getBayer4(vec2 uv) {
+  ivec2 pos = ivec2(fract(uv / 4.0) * 4.0);
+  return float(bayer4x4[pos.y * 4 + pos.x]) / 16.0;
+}
+
+void main() {
+  float t = 0.5 * u_time;
+  float pxSize = u_pxSize * u_pixelRatio;
+
+  // Per-cell UV (all pixels in a dither cell share the same shape value)
+  vec2 pxSizeUV = (gl_FragCoord.xy - 0.5 * u_resolution) / pxSize;
+  vec2 cellUV    = (floor(pxSizeUV) + 0.5) * pxSize;
+  vec2 normUV    = cellUV / u_resolution;
+
+  // Shape UV — matches Paper Shaders "pattern" UV for 100vw×100vh, fit=none, scale=1, rotation=0
+  vec2 shapeUV = normUV;
+  shapeUV += vec2(-u_offsetX, u_offsetY);
+  shapeUV *= u_resolution / u_pixelRatio;
+  shapeUV += 0.5;
+  shapeUV *= 0.003;
+
+  // Warp shape (extracted verbatim from paper-shaders source)
+  for (float i = 1.0; i < 6.0; i++) {
+    shapeUV.x += 0.6 / i * cos(i * 2.5 * shapeUV.y + t);
+    shapeUV.y += 0.6 / i * cos(i * 1.5 * shapeUV.x + t);
+  }
+  float shape = 0.15 / max(0.001, abs(sin(t - shapeUV.y - shapeUV.x)));
+  shape = smoothstep(0.02, 1.0, shape);
+
+  // Ordered dithering — exact paper-shaders formula
+  float dithering = getBayer4(pxSizeUV);
+  dithering -= 0.5;
+  float res = step(0.5, shape + dithering);
+
+  vec3  fg  = u_colorFront.rgb;
+  float fgA = u_colorFront.a;
+  vec3  bg  = u_colorBack.rgb;
+  float bgA = u_colorBack.a;
+
+  vec3  color   = fg * res + bg  * (1.0 - res);
+  float opacity = fgA * res + bgA * (1.0 - res);
+  fragColor = vec4(color, opacity);
+}`;
+
+    function hexToRgba(hex) {
+      hex = hex.replace('#','');
+      return [
+        parseInt(hex.slice(0,2),16)/255,
+        parseInt(hex.slice(2,4),16)/255,
+        parseInt(hex.slice(4,6),16)/255,
+        1.0
+      ];
+    }
+
+    const canvas = document.getElementById('c');
+    const pr = window.devicePixelRatio || 1;
+    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false });
+
+    function compile(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error(gl.getShaderInfoLog(s));
+        throw new Error('shader compile failed');
+      }
+      return s;
+    }
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER,   VERT));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    // Full-screen quad
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1,-1,  1,-1,  -1,1,
+       1,-1,  1, 1,  -1,1
+    ]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    const uTime    = gl.getUniformLocation(prog, 'u_time');
+    const uRes     = gl.getUniformLocation(prog, 'u_resolution');
+    const uPR      = gl.getUniformLocation(prog, 'u_pixelRatio');
+    const uBack    = gl.getUniformLocation(prog, 'u_colorBack');
+    const uFront   = gl.getUniformLocation(prog, 'u_colorFront');
+    const uPxSize  = gl.getUniformLocation(prog, 'u_pxSize');
+    const uOffsetX = gl.getUniformLocation(prog, 'u_offsetX');
+    const uOffsetY = gl.getUniformLocation(prog, 'u_offsetY');
+
+    // Props matching the original exactly
+    gl.uniform4fv(uBack,  hexToRgba('#FFFAE5'));
+    gl.uniform4fv(uFront, hexToRgba('#1500ff'));
+    gl.uniform1f(uPxSize,   2.8);
+    gl.uniform1f(uOffsetX, -1.0);
+    gl.uniform1f(uOffsetY, -1.0);
+    gl.uniform1f(uPR, pr);
+
+    function resize() {
+      canvas.width  = Math.round(window.innerWidth  * pr);
+      canvas.height = Math.round(window.innerHeight * pr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const speed = 0.15;
+    const start = performance.now();
+    function loop(now) {
+      gl.uniform1f(uTime, (now - start) / 1000 * speed);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>

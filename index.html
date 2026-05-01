@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MH4YEG8SJZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MH4YEG8SJZ');
+  </script>
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <link rel="preload" href="fonts/LittleCharacter-Regular.ttf" as="font" type="font/truetype" crossorigin>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christopher Howat</title>
+  <meta name="description" content="Christopher Howat, Content creator, graphic designer, and photographer based in Glasgow.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"></noscript>
+  <style>
+    @font-face {
+      font-family: 'Little Character';
+      src: url('fonts/LittleCharacter-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: block;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #FFF3E5;
+      --red:     #e03b22;
+      --ink:     #1a1a1a;
+      --muted:   #8a7b6a;
+      --border:  #e0d5c5;
+      --surface: #f2ebe0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Game of Life background ────────────────────────────────────── */
+    #gol-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Dither background (projects section) ────────────────────────── */
+    #projects {
+      position: relative;
+      overflow: hidden;
+    }
+    #dither-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #projects .section-wrap {
+      position: relative;
+      z-index: 1;
+    }
+    #projects .section-eyebrow,
+    #projects .project-name,
+    #projects .project-tag {
+      color: var(--ink);
+    }
+
+    /* ── Canvas (mouse trail) ───────────────────────────────────────── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9989;
+    }
+
+    /* ── Nav ────────────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3.5rem;
+      padding: 1.5rem 2rem;
+      background: rgba(255, 243, 229, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      position: relative;
+      padding-bottom: 2px;
+      transition: color 0.2s;
+    }
+
+    .nav-link::after {
+      content: '——';
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      color: var(--red);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .nav-link:hover { color: var(--ink); }
+    .nav-link.active { color: var(--ink); }
+    .nav-link.active::after { opacity: 1; }
+
+    /* ── Hero ───────────────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 2rem 5rem;
+    }
+
+    /* Hero text/buttons float above the GOL canvas */
+    .hero-heading,
+    .hero-sub,
+    .hero-actions {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-heading {
+      font-family: 'Little Character', sans-serif;
+      font-size: clamp(2rem, 5.5vw, 4.25rem);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      color: var(--red);
+      max-width: 820px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 3rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.85rem 1.75rem;
+      border-radius: 0;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: var(--cream);
+    }
+
+    .btn-primary:hover {
+      background: #c4321d;
+    }
+
+    .btn-outline {
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    /* ── Pixel fill buttons ─────────────────────────────────────── */
+    .pixel-btn {
+      position: relative;
+      overflow: hidden;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .pixel-btn.btn-primary {
+      background: transparent;
+      color: var(--red);
+      border: 1.5px solid var(--red);
+    }
+
+    .pixel-btn.btn-primary:hover,
+    .pixel-btn.btn-outline:hover {
+      background: transparent;
+      color: var(--cream);
+      border-color: var(--red);
+    }
+
+    .pixel-btn__pixels {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .pixel-btn__pixel {
+      background: var(--red);
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity 80ms ease, transform 80ms ease;
+      transition-delay: calc(var(--i) * 15ms);
+    }
+
+    .pixel-btn:hover .pixel-btn__pixel {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pixel-btn__label {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Section ────────────────────────────────────────────────────── */
+    .section-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 6rem 2rem;
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Flush projects section against dither strip ───────────────── */
+    #projects .section-wrap { padding-bottom: 0 !important; }
+
+    /* ── Dither strip transitions ───────────────────────────────────── */
+    .dither-strip {
+      height: 128px;
+      width: 100%;
+      display: block;
+      background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%224%22%20height%3D%2264%22%20viewBox%3D%220%200%204%2064%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2210%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2212%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2212%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2214%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2214%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2216%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2216%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2217%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2218%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2218%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2220%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2220%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2221%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2223%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2225%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2225%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2227%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2229%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2229%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2230%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2230%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2231%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2231%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2232%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2232%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2232%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2233%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2233%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2234%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2234%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2235%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2235%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2236%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2236%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2236%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2237%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2237%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2238%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2238%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2238%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2239%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2239%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2240%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2240%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2240%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2240%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2241%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2241%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2242%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2242%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2242%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2243%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2243%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2245%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2245%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2247%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2247%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2249%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2249%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2249%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2251%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2251%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2253%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2253%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2253%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2255%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2255%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2255%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2259%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2259%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2259%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23e03b22%22%2F%3E%3C%2Fsvg%3E');
+      background-size: 8px 128px;
+      background-repeat: repeat-x;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .dither-strip.REMOVED {
+      background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%224%22%20height%3D%2264%22%20viewBox%3D%220%200%204%2064%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23e03b22%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2210%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2212%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2212%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2214%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2214%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2216%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2216%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2217%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2218%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2218%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2220%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2220%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2221%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2223%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2225%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2225%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2227%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2228%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2229%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2229%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2230%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2230%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2231%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2231%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2232%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2232%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2233%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2233%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2234%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2234%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2235%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2235%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2236%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2236%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2236%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2237%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2237%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2238%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2238%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2238%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2239%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2239%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2240%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2240%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2240%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2241%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2241%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2242%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2242%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2242%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2243%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2243%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2244%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2245%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2245%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2246%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2247%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2247%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2248%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2249%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2249%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2249%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2250%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2251%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2251%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2252%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2253%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2253%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2253%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2254%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2255%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2255%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2255%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2256%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2257%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2258%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2259%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2259%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2259%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2260%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2261%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2262%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%222%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2263%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%23FFF3E5%22%2F%3E%3C%2Fsvg%3E');
+      transform: scaleY(-1);
+    }
+
+    .section-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: 'Little Character', sans-serif;
+      font-size: clamp(1.75rem, 4vw, 3rem);
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+      margin-bottom: 3rem;
+      color: var(--ink);
+    }
+
+    /* ── About ──────────────────────────────────────────────────────── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+      align-content: start;
+    }
+
+    .about-body p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.9;
+      margin-bottom: 1.25rem;
+    }
+
+    .about-body p strong { color: var(--ink); font-weight: 500; }
+
+    .skills-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1rem;
+    }
+
+    .skills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+    }
+
+    .skill {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.85rem;
+      border-radius: 0;
+      letter-spacing: 0.03em;
+      transition: all 0.2s;
+    }
+
+    .skill:hover {
+      color: var(--red);
+      border-color: var(--red);
+      background: rgba(224, 59, 34, 0.05);
+    }
+
+    /* ── About portrait ────────────────────────────────────────────── */
+    .about-portrait-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .about-portrait {
+      width: 260px;
+      height: auto;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    /* ── Projects ───────────────────────────────────────────────────── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem 2.5rem;
+    }
+
+    .project-card {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .project-img-wrap {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      background: var(--surface);
+      margin-bottom: 1.1rem;
+    }
+
+    .project-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .project-name {
+      font-family: 'Little Character', sans-serif;
+      font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+      color: var(--red);
+      background: var(--cream);
+      width: fit-content;
+      padding: 0.1rem 0.35rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.6rem;
+    }
+
+    .project-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink);
+      background: var(--cream);
+      padding: 0.15rem 0.45rem;
+      border-radius: 0;
+    }
+
+    .project-tag + .project-tag::before {
+      content: none;
+    }
+
+    /* ── Timeline ───────────────────────────────────────────────────── */
+    .timeline { display: flex; flex-direction: column; }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 3rem;
+      padding: 2.25rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .timeline-item:last-child { border-bottom: 1px solid var(--border); }
+
+    .tl-company {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.2rem;
+    }
+
+    .tl-type {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .tl-role {
+      font-family: 'Little Character', sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.01em;
+      margin-bottom: 0.75rem;
+      color: var(--ink);
+    }
+
+    .tl-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .tl-bullets li {
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+
+    .tl-bullets li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--red);
+      opacity: 0.5;
+    }
+
+    /* ── Education ──────────────────────────────────────────────────── */
+    .edu-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 2rem 2.5rem;
+    }
+
+    .edu-icon {
+      font-size: 2rem;
+    }
+
+    .edu-degree {
+      font-family: 'Little Character', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.01em;
+      margin-bottom: 0.2rem;
+    }
+
+    .edu-school {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--red);
+    }
+
+    /* ── Contact ────────────────────────────────────────────────────── */
+    #contact .section-wrap { text-align: center; }
+    #contact .section-eyebrow,
+    #contact .section-title { text-align: center; }
+
+    .contact-email {
+      font-family: 'Little Character', sans-serif;
+      font-size: clamp(1.25rem, 3.5vw, 2.25rem);
+      color: var(--red);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: opacity 0.2s;
+      display: inline-block;
+      margin-bottom: 3rem;
+    }
+
+    .contact-email:hover { opacity: 0.65; }
+
+
+    /* ── Inverted sections (post-projects) ─────────────────────────── */
+    #experience, #education, #contact { background: var(--red); }
+
+    #experience .section-eyebrow,
+    #education  .section-eyebrow,
+    #contact    .section-eyebrow { color: rgba(255,243,229,0.55); }
+
+    #experience .section-title,
+    #education  .section-title,
+    #contact    .section-title { color: var(--cream); }
+
+    #experience .tl-company { color: var(--cream); }
+    #experience .tl-type    { color: rgba(255,243,229,0.45); }
+    #experience .tl-role    { color: var(--cream); }
+    #experience .tl-bullets li { color: rgba(255,243,229,0.7); }
+    #experience .tl-bullets li::before { color: rgba(255,243,229,0.4); }
+    #experience .timeline-item { border-top-color: rgba(255,243,229,0.18); }
+    #experience .timeline-item:last-child { border-bottom-color: rgba(255,243,229,0.18); }
+
+    #education .edu-card   { background: rgba(255,243,229,0.08); border-color: rgba(255,243,229,0.18); }
+    #education .edu-degree { color: var(--cream); }
+    #education .edu-school { color: rgba(255,243,229,0.55); }
+
+    #contact .contact-email { color: var(--cream); }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid rgba(255,243,229,0.18);
+      padding: 1.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--red);
+      color: rgba(255,243,229,0.55);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    /* ── Loading screen ─────────────────────────────────────────────── */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #loading-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #loading-text {
+      position: relative;
+      z-index: 1;
+      font-family: 'Little Character', sans-serif;
+      font-size: clamp(2rem, 6vw, 4rem);
+      color: #faf4eb;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      nav { gap: 2rem; }
+      .section-wrap { padding: 4rem 1.5rem; }
+      #projects .section-wrap { padding-bottom: 0 !important; }
+      #hero { padding: 7rem 1.5rem 4rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-portrait { width: 200px; }
+      .projects-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .timeline-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+      #particle-canvas { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Loading screen ───────────────────────────────────────────── -->
+  <div id="loading-screen">
+    <canvas id="loading-canvas"></canvas>
+    <p id="loading-text">Christopher Howat</p>
+  </div>
+
+  <script>
+    (function () {
+      var BLOCK        = 2;
+      var DURATION     = 2200;
+      var DITHER_BAND  = 0.5;
+      var BAYER8 = [
+        [ 0,32, 8,40, 2,34,10,42],
+        [48,16,56,24,50,18,58,26],
+        [12,44, 4,36,14,46, 6,38],
+        [60,28,52,20,62,30,54,22],
+        [ 3,35,11,43, 1,33, 9,41],
+        [51,19,59,27,49,17,57,25],
+        [15,47, 7,39,13,45, 5,37],
+        [63,31,55,23,61,29,53,21]
+      ];
+
+      function bezier(x1,y1,x2,y2) {
+        return function(t) {
+          var lo=0, hi=1, mid;
+          for (var i=0; i<20; i++) {
+            mid = (lo+hi)/2;
+            var u = 1-mid;
+            var x = 3*x1*u*u*mid + 3*x2*u*mid*mid + mid*mid*mid;
+            if (x < t) lo=mid; else hi=mid;
+          }
+          var u = 1-mid;
+          return 3*y1*u*u*mid + 3*y2*u*mid*mid + mid*mid*mid;
+        };
+      }
+      var ease = bezier(0.63, 0.06, 0.13, 0.87);
+
+      var overlay  = document.getElementById('loading-screen');
+      var canvas   = document.getElementById('loading-canvas');
+      var loadText = document.getElementById('loading-text');
+      if (!overlay || !canvas || !loadText) return;
+
+      var ctx = canvas.getContext('2d');
+      var dpr = window.devicePixelRatio || 1;
+      var vw  = window.innerWidth;
+      var vh  = window.innerHeight;
+
+      canvas.width  = vw * dpr;
+      canvas.height = vh * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = '#e03b22';
+      ctx.fillRect(0, 0, vw, vh);
+      // loading text colour already set via CSS
+
+      document.documentElement.style.overflow = 'hidden';
+
+      function startDither() {
+        document.documentElement.style.overflow = '';
+        overlay.style.background    = 'transparent';
+        overlay.style.pointerEvents = 'none';
+
+        var cols   = Math.ceil(vw / BLOCK);
+        var rows   = Math.ceil(vh / BLOCK);
+        var blocks = [];
+
+        for (var r=0; r<rows; r++) {
+          for (var c=0; c<cols; c++) {
+            var ny = rows > 1 ? r/(rows-1) : 0;
+            var bv = BAYER8[r%8][c%8] / 64;
+            blocks.push([ny*(1-DITHER_BAND) + bv*DITHER_BAND, c*BLOCK, r*BLOCK]);
+          }
+        }
+        blocks.sort(function(a,b){ return a[0]-b[0]; });
+
+        var textRect   = loadText.getBoundingClientRect();
+        var sweepScale = 1 / (1 - DITHER_BAND);
+        var startTime  = null;
+        var idx        = 0;
+
+        function frame(ts) {
+          if (startTime === null) startTime = ts;
+          var progress = ease(Math.min((ts-startTime)/DURATION, 1));
+
+          while (idx < blocks.length && blocks[idx][0] <= progress) {
+            ctx.clearRect(blocks[idx][1], blocks[idx][2], BLOCK, BLOCK);
+            idx++;
+          }
+
+          var sweepY  = Math.min(progress * vh * sweepScale, vh);
+          var clipPx  = Math.max(0, sweepY - textRect.top);
+          var clipPct = Math.min(100, (clipPx / textRect.height) * 100);
+          loadText.style.clipPath = 'inset(' + clipPct + '% 0 0 0)';
+
+          if ((ts - startTime) < DURATION) {
+            requestAnimationFrame(frame);
+          } else {
+            overlay.remove();
+          }
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      if (document.readyState === 'complete') {
+        startDither();
+      } else {
+        window.addEventListener('load', startDither);
+      }
+    })();
+  </script>
+
+  <!-- Particle canvas (mouse trail) -->
+  <canvas id="particle-canvas"></canvas>
+
+  <main>
+  <!-- ── Nav ──────────────────────────────────────────────────────── -->
+  <nav>
+    <a href="#hero"       class="nav-link active">Home</a>
+    <a href="#about"      class="nav-link">About</a>
+    <a href="#projects"   class="nav-link">Work</a>
+    <a href="#experience" class="nav-link">Experience</a>
+    <a href="#contact"    class="nav-link">Contact</a>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────────────────────────── -->
+  <section id="hero">
+    <canvas id="gol-bg" data-gol data-cell-size="7" data-speed-ms="90" data-color="224,59,34"></canvas>
+    <h1 class="hero-heading">
+      I'm Christopher, a content creator,<br>
+      graphic designer, and photographer<br>
+      based in Glasgow.
+    </h1>
+    <p class="hero-sub">Glasgow, Scotland</p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-primary pixel-btn">View My Work</a>
+      <a href="mailto:hello@christopherhowat.com" class="btn btn-outline pixel-btn">Get in Touch</a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── About ────────────────────────────────────────────────────── -->
+  <div id="about">
+    <div class="section-wrap">
+      <div class="about-grid">
+        <!-- Left: heading + bio -->
+        <div>
+          <p class="section-eyebrow">About</p>
+          <h2 class="section-title">Based in Glasgow,<br>working in digital</h2>
+          <div class="about-body">
+            <p>
+              I'm <strong>Christopher</strong>, a digital marketing and content professional based in Glasgow.
+              I work across social media management, graphic design, photography, and web content.
+            </p>
+            <p>
+              I've worked with organisations including Gold Seal Homecare, the British Red Cross,
+              and the Alasdair Gray Archive, handling everything from day-to-day social content
+              to campaign design and event photography.
+            </p>
+            <p>
+              I studied <strong>Audio Technology</strong> at Glasgow Caledonian University,
+              and have a background in audio production alongside my marketing work.
+            </p>
+          </div>
+        </div>
+        <!-- Right: portrait + skills -->
+        <div class="about-portrait-wrap">
+          <img src="images/me.gif" alt="Christopher Howat" class="about-portrait">
+          <div style="margin-top:1.5rem; width:100%;">
+            <p class="skills-eyebrow">Skills</p>
+            <div class="skills-wrap">
+              <span class="skill">Content Creation</span>
+              <span class="skill">Photography</span>
+              <span class="skill">Audio Engineering</span>
+              <span class="skill">Podcast Production</span>
+              <span class="skill">Music Composition</span>
+              <span class="skill">Sound Design</span>
+              <span class="skill">Mixing &amp; Mastering</span>
+              <span class="skill">Graphic Design</span>
+              <span class="skill">Social Media</span>
+              <span class="skill">Branding</span>
+              <span class="skill">Digital Marketing</span>
+              <span class="skill">Visual Storytelling</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Projects ─────────────────────────────────────────────────── -->
+  <div id="projects">
+    <canvas id="dither-bg"></canvas>
+    <div class="section-wrap">
+      <p class="section-eyebrow">Selected Work</p>
+      <h2 class="section-title">Projects</h2>
+      <div class="projects-grid">
+
+        <a href="wednesday-wanders.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/wednesday-wanders.webp" alt="Wednesday Wanders" loading="lazy">
+          </div>
+          <h3 class="project-name">Wednesday Wanders</h3>
+          <div class="project-tags">
+            <span class="project-tag">Photography</span>
+            <span class="project-tag">Content Creation</span>
+            <span class="project-tag">Social Media</span>
+          </div>
+        </a>
+
+        <a href="gray-day.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/gray-day.webp" alt="Gray Day × Poor Things" loading="lazy">
+          </div>
+          <h3 class="project-name">Gray Day × Poor Things</h3>
+          <div class="project-tags">
+            <span class="project-tag">Graphic Design</span>
+            <span class="project-tag">Campaign</span>
+            <span class="project-tag">Event Content</span>
+          </div>
+        </a>
+
+        <a href="doors-open-day.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/doors-open-day.webp" alt="Glasgow Doors Open Day" loading="lazy">
+          </div>
+          <h3 class="project-name">Glasgow Doors Open Day</h3>
+          <div class="project-tags">
+            <span class="project-tag">Photography</span>
+            <span class="project-tag">Graphic Design</span>
+            <span class="project-tag">Digital Content</span>
+          </div>
+        </a>
+
+        <a href="graphic-design.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/gd-jorts.webp" alt="Personal Graphic Design" loading="lazy" style="object-position: center 25%;">
+          </div>
+          <h3 class="project-name">Personal Graphic Design</h3>
+          <div class="project-tags">
+            <span class="project-tag">Illustration</span>
+            <span class="project-tag">Typography</span>
+            <span class="project-tag">Print</span>
+            <span class="project-tag">Personal</span>
+          </div>
+        </a>
+
+        <a href="british-red-cross.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/spwk.webp" alt="British Red Cross" loading="lazy">
+          </div>
+          <h3 class="project-name">British Red Cross</h3>
+          <div class="project-tags">
+            <span class="project-tag">Content Creation</span>
+            <span class="project-tag">Social Media</span>
+            <span class="project-tag">Campaign</span>
+          </div>
+        </a>
+
+        <a href="music.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/music.webp" alt="Music Composition" loading="lazy">
+          </div>
+          <h3 class="project-name">Music Composition</h3>
+          <div class="project-tags">
+            <span class="project-tag">Composition</span>
+            <span class="project-tag">Redcat Creative</span>
+            <span class="project-tag">Personal Projects</span>
+          </div>
+        </a>
+
+        <a href="gold-seal.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/gs-photo-DSC09420.webp" alt="Gold Seal Homecare" loading="lazy">
+          </div>
+          <h3 class="project-name">Gold Seal Homecare</h3>
+          <div class="project-tags">
+            <span class="project-tag">Graphic Design</span>
+            <span class="project-tag">Photography</span>
+            <span class="project-tag">Webflow</span>
+            <span class="project-tag">SEO</span>
+          </div>
+        </a>
+
+        <a href="photography.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/photo-dsc00063.webp" alt="Personal Photography" loading="lazy">
+          </div>
+          <h3 class="project-name">Personal Photography</h3>
+          <div class="project-tags">
+            <span class="project-tag">Photography</span>
+            <span class="project-tag">Personal</span>
+          </div>
+        </a>
+
+        <a href="snoopy.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/snoopy-3d-design.webp" alt="Puffer Jacket Snoopy" loading="lazy">
+          </div>
+          <h3 class="project-name">Puffer Jacket Snoopy</h3>
+          <div class="project-tags">
+            <span class="project-tag">3D Design</span>
+            <span class="project-tag">3D Printing</span>
+            <span class="project-tag">Blender</span>
+            <span class="project-tag">AR Filter</span>
+          </div>
+        </a>
+
+        <a href="dreadcore.html" class="project-card">
+          <div class="project-img-wrap">
+            <img src="images/tots-united.webp" alt="The Dreadcore" loading="lazy">
+          </div>
+          <h3 class="project-name">The Dreadcore</h3>
+          <div class="project-tags">
+            <span class="project-tag">Audio</span>
+            <span class="project-tag">Composition</span>
+            <span class="project-tag">Audiobook</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="dither-strip" aria-hidden="true"></div>
+
+  <!-- ── Experience ───────────────────────────────────────────────── -->
+  <div id="experience">
+    <div class="section-wrap">
+      <p class="section-eyebrow">Experience</p>
+      <h2 class="section-title">Where I've<br>worked</h2>
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div>
+            <p class="tl-company">Gold Seal Homecare LTD.</p>
+            <p class="tl-type">Role</p>
+          </div>
+          <div>
+            <h3 class="tl-role">Social Media &amp; Web Content Manager</h3>
+            <ul class="tl-bullets">
+              <li>Managed and updated the company website using Webflow, improving usability and on-page SEO</li>
+              <li>Planned and created social media content for installations, promotions, and customer testimonials</li>
+              <li>Designed graphics and marketing materials for digital campaigns and seasonal promotions</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div>
+            <p class="tl-company">British Red Cross</p>
+            <p class="tl-type">Role</p>
+          </div>
+          <div>
+            <h3 class="tl-role">Content Creator</h3>
+            <ul class="tl-bullets">
+              <li>Created digital content for employer brand campaigns</li>
+              <li>Produced recruitment and support worker promotional materials</li>
+              <li>Managed social media content across multiple channels</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div>
+            <p class="tl-company">The Alasdair Gray Archive</p>
+            <p class="tl-type">Role</p>
+          </div>
+          <div>
+            <h3 class="tl-role">Digital Communicator</h3>
+            <ul class="tl-bullets">
+              <li>Led event promotion and social media strategy</li>
+              <li>Designed posters and visual assets for Gray Day</li>
+              <li>Produced campaign content for cultural events</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div>
+            <p class="tl-company">Redcat Creative</p>
+            <p class="tl-type">Role</p>
+          </div>
+          <div>
+            <h3 class="tl-role">Junior Music Composer</h3>
+            <ul class="tl-bullets">
+              <li>Composed original music for TV productions to client briefs</li>
+              <li>Handled full audio production pipeline from brief to delivery</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Education ────────────────────────────────────────────────── -->
+  <div id="education">
+    <div class="section-wrap">
+      <p class="section-eyebrow">Education</p>
+      <h2 class="section-title">Background</h2>
+      <div class="edu-card">
+        <div>
+          <h3 class="edu-degree">Audio Technology</h3>
+          <p class="edu-school">Glasgow Caledonian University</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Contact ──────────────────────────────────────────────────── -->
+  <div id="contact">
+    <div class="section-wrap">
+      <p class="section-eyebrow">Contact</p>
+      <h2 class="section-title">Let's work<br>together</h2>
+      <a href="mailto:hello@christopherhowat.com" class="contact-email">
+        hello@christopherhowat.com
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Footer ───────────────────────────────────────────────────── -->
+  <footer>
+    <span>© 2026 Christopher Howat</span>
+    <span>Glasgow, Scotland</span>
+  </footer>
+  </main>
+
+  <!-- ── Pixel-grid trail — faithful port of PT.BTp_3NCK.js ─────────── -->
+  <script>
+    // ─── Trail texture  (nm class) ────────────────────────────────────
+    // A hidden 512×512 canvas accumulates radial gradients via screen-
+    // blending, exactly like nm.drawTouch / nm.update in the source.
+    const TEX_SIZE  = 512;  // T = 512  (trailSize 0.1 >= 0.08)
+    const MAX_AGE   = 250;  // maxAge: 250 ms
+    const RADIUS    = 0.055;  // radius = trailSize (reduced for tighter spread)
+    const INTENSITY = 0.2;  // intensity: 0.2
+    const SMOOTHING = 0.9;  // smoothing: 0.9 (default)
+    const MIN_FORCE = 0.3;  // minForce: 0.3
+
+    const texCanvas = document.createElement('canvas');
+    texCanvas.width = texCanvas.height = TEX_SIZE;
+    const texCtx = texCanvas.getContext('2d');
+
+    let pts      = [];   // { x, y, age, force }  — x/y in coverUv space
+    let tForce   = 0;
+    let lastPt   = null;
+
+    // ease is the identity function — source passes easingFunction: S=>S
+    // (im default), which overrides nm's em default when calling tm()
+    const ease = t => Math.max(0, Math.min(1, t));
+
+    // Jh: smoothed lerp
+    const sLerp = (a, b, s) => b * s + a * (1 - s);
+
+    // coverUv — port of the GLSL coverUv() in the fragment shader.
+    // Converts raw screen-normalised coords (0-1) to the square UV space
+    // used by the grid and trail texture, matching:
+    //   vec2 s = resolution / max(resolution.x, resolution.y);
+    //   uv = (screenUv - 0.5) * s + 0.5;
+    function coverUv(nx, ny) {
+      const W = canvas.width, H = canvas.height, M = Math.max(W, H);
+      const sx = W / M, sy = H / M;
+      // ny is canvas-y (0=top); OpenGL screenUv.y is flipped (0=bottom)
+      return {
+        x: Math.max(0, Math.min(1, (nx - 0.5) * sx + 0.5)),
+        y: Math.max(0, Math.min(1, (0.5 - ny) * sy + 0.5))
+      };
+    }
+
+    // addTouch — nm.addTouch
+    function addTouch(nx, ny) {
+      const uv = coverUv(nx, ny);
+      if (lastPt) {
+        const dx = lastPt.x - uv.x, dy = lastPt.y - uv.y;
+        const dSq = dx*dx + dy*dy;
+        const f = Math.max(MIN_FORCE, Math.min(dSq * 1e4, 1));
+        tForce = sLerp(f, tForce, SMOOTHING);
+        // interpolate: 1  →  ceil(dSq / (radius*0.5/1)²)
+        const steps = Math.ceil(dSq / Math.pow(RADIUS * 0.5, 2));
+        for (let i = 1; i < steps; i++)
+          pts.push({ x: lastPt.x - dx/steps*i, y: lastPt.y - dy/steps*i, age: 0, force: f });
+      }
+      pts.push({ x: uv.x, y: uv.y, age: 0, force: tForce });
+      lastPt = { x: uv.x, y: uv.y };
+    }
+
+    // drawTouch — nm.drawTouch
+    // pt.x/y are in coverUv space (0-1, y=0 bottom like OpenGL).
+    // Texture canvas uses y=0 at top, so we flip: py = (1-pt.y)*TEX_SIZE
+    function drawTouch(pt) {
+      const px = pt.x * TEX_SIZE;
+      const py = (1 - pt.y) * TEX_SIZE;   // flip y: coverUv→canvas coords
+
+      let fade = pt.age < MAX_AGE * 0.3
+        ? ease(pt.age / (MAX_AGE * 0.3))
+        : ease(1 - (pt.age - MAX_AGE * 0.3) / (MAX_AGE * 0.7));
+      fade *= pt.force;
+
+      const r = TEX_SIZE * RADIUS * fade;
+      if (r <= 0) return;
+
+      texCtx.globalCompositeOperation = 'screen';
+      const g = texCtx.createRadialGradient(px, py, Math.max(0, r*0.25), px, py, r);
+      g.addColorStop(0, `rgba(255,255,255,${INTENSITY})`);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      texCtx.fillStyle = g;
+      texCtx.beginPath();
+      texCtx.arc(px, py, r, 0, Math.PI * 2);
+      texCtx.fill();
+    }
+
+    function updateTexture(dt) {
+      texCtx.globalCompositeOperation = 'source-over';
+      texCtx.fillStyle = 'black';
+      texCtx.fillRect(0, 0, TEX_SIZE, TEX_SIZE);
+      pts = pts.filter(p => { p.age += dt * 1000; return p.age < MAX_AGE; });
+      if (!pts.length) tForce = 0;
+      pts.forEach(drawTouch);
+    }
+
+    // ─── Grid renderer  (fragment shader) ────────────────────────────
+    // Shader (from source):
+    //   vec2 uv = coverUv(gl_FragCoord.xy / resolution);
+    //   vec2 gridUvCenter = (floor(uv * gridSize) + 0.5) / gridSize;
+    //   float trail = texture2D(mouseTrail, gridUvCenter).r;
+    //   gl_FragColor = vec4(pixelColor, trail);
+    //
+    // gridSize default in rm shader = 100 (Kh({gridSize:100,...}))
+    // Match GOL cell size (7px) — recalculate on resize
+    let GRID = Math.round(Math.max(window.innerWidth, window.innerHeight) / 7);
+    window.addEventListener('resize', () => {
+      GRID = Math.round(Math.max(window.innerWidth, window.innerHeight) / 7);
+    });
+
+    const canvas = document.getElementById('particle-canvas');
+    const ctx    = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let mouseClientY = 0;
+    document.addEventListener('mousemove', e => {
+      mouseClientY = e.clientY;
+      // Hide trail over text links/buttons (nav, contact, CTAs) but keep it everywhere else
+      if (e.target.closest('a:not(.project-card), button')) return;
+      addTouch(e.clientX / window.innerWidth, e.clientY / window.innerHeight);
+    });
+
+    // Cache the inverted-section offset — update on scroll/resize, not every frame
+    const _inv = document.getElementById('experience');
+    let _invTop = _inv ? _inv.getBoundingClientRect().top + window.scrollY : Infinity;
+    const _updateInvTop = () => { _invTop = _inv ? _inv.getBoundingClientRect().top + window.scrollY : Infinity; };
+    window.addEventListener('scroll', _updateInvTop, { passive: true });
+    window.addEventListener('resize', _updateInvTop);
+
+    let lastTime = performance.now();
+
+    function tick(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime  = now;
+      updateTexture(dt);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // coverUv makes each grid cell exactly cellSize×cellSize SCREEN pixels,
+      // regardless of viewport aspect ratio — the same guarantee the GLSL
+      // coverUv() function provides. cellSize = max(W,H) / gridSize.
+      const W = canvas.width, H = canvas.height, M = Math.max(W, H);
+      const cellSize = M / GRID;   // square cell side in screen pixels
+      const sx = W / M, sy = H / M;
+
+      const pxData = texCtx.getImageData(0, 0, TEX_SIZE, TEX_SIZE).data;
+      const trailCol = (window.scrollY + mouseClientY) >= _invTop ? '#FFF3E5' : '#e03b22';
+
+      // Iterate ALL GRID×GRID cells — same as the shader visiting every pixel.
+      // Cells outside the viewport produce off-screen fillRect calls that are
+      // silently clipped; only cells near the mouse have brightness > 0 anyway.
+      for (let r = 0; r < GRID; r++) {
+        for (let c = 0; c < GRID; c++) {
+          // Cell centre in coverUv space (y=0 at bottom, OpenGL convention)
+          const uvX = (c + 0.5) / GRID;
+          const uvY = (r + 0.5) / GRID;
+
+          // Sample trail texture (texture canvas y=0 at top → flip)
+          const tx = Math.min(TEX_SIZE-1, Math.floor(uvX * TEX_SIZE));
+          const ty = Math.min(TEX_SIZE-1, Math.floor((1 - uvY) * TEX_SIZE));
+          const brightness = pxData[(ty * TEX_SIZE + tx) * 4] / 255;
+
+          if (brightness > 0.05) {
+            // Inverse coverUv → screen pixels
+            const screenX = ((uvX - 0.5) / sx + 0.5) * W;
+            const screenY = (0.5 - (uvY - 0.5) / sy) * H;
+
+            ctx.fillStyle = trailCol;
+            // Each cell is exactly cellSize×cellSize on screen
+            ctx.fillRect(
+              Math.round(screenX - cellSize / 2),
+              Math.round(screenY - cellSize / 2),
+              Math.ceil(cellSize),
+              Math.ceil(cellSize)
+            );
+          }
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+
+    // ── Nav active link on scroll ─────────────────────────────────────
+    const sections = document.querySelectorAll('#hero, #about, #projects, #experience, #contact');
+    const navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      });
+    }, { passive: true });
+  </script>
+
+  <!-- ── Game of Life background init ─────────────────────────────────── -->
+  <script>
+    (function () {
+      const cellSize = 7;
+      const canvas   = document.getElementById('gol-bg');
+      const hero     = document.getElementById('hero');
+      const w = hero ? hero.offsetWidth  : window.innerWidth;
+      const h = hero ? hero.offsetHeight : window.innerHeight;
+      canvas.dataset.cols = Math.ceil(w / cellSize);
+      canvas.dataset.rows = Math.ceil(h / cellSize);
+    })();
+  </script>
+  <script src="game-of-life.js"></script>
+  <script src="dither-bg.js"></script>
+  <script src="grain.js"></script>
+  <script src="favicon-anim.js"></script>
+  <script src="perimeter.js"></script>
+  <script src="pixel-btn.js"></script>
+  <script>
+  </script>
+
+</body>
+</html>

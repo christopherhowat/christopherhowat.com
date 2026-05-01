@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MH4YEG8SJZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MH4YEG8SJZ');
+  </script>
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Graphic Design — Christopher Howat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="fonts/LittleCharacter-Regular.ttf" as="font" type="font/truetype" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap"></noscript>
+  <link rel="stylesheet" href="project.css">
+  <style>
+    .gd-section {
+      margin-top: 3rem;
+    }
+
+    .gd-section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .pair-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .pair-grid img,
+    .single-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .pair-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#about" class="nav-link">About</a>
+    <a href="index.html#projects" class="nav-link active">Work</a>
+    <a href="index.html#experience" class="nav-link">Experience</a>
+    <a href="index.html#contact" class="nav-link">Contact</a>
+  </nav>
+
+  <div class="project-page">
+
+    <a href="index.html#projects" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      All Projects
+    </a>
+
+    <div class="project-header">
+      <p class="project-eyebrow">Graphic Design · Personal</p>
+      <h1 class="project-title">Personal Graphic Design</h1>
+      <div class="project-meta">
+        <span class="meta-tag">Illustration</span>
+        <span class="meta-tag">Typography</span>
+        <span class="meta-tag">Print</span>
+        <span class="meta-tag">Personal Projects</span>
+      </div>
+    </div>
+
+    <div class="project-desc">
+      <h2>About</h2>
+      <p>
+        A collection of personal graphic design work, made for fun, for friends, and for the sake of making things.
+      </p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Celtic cards -->
+    <div class="gd-section">
+      <p class="gd-section-label">Celtic FC — Baseball Cards</p>
+      <div class="pair-grid">
+        <img src="images/gd-jota.webp" alt="Jota baseball card" loading="lazy">
+        <img src="images/gd-maeda.webp" alt="Maeda baseball card" loading="lazy">
+      </div>
+      <div class="project-desc" style="margin-top:1rem;">
+        <p>Baseball card-style designs for Celtic FC players Jota and Maeda.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Fruit & Veg posters -->
+    <div class="gd-section">
+      <p class="gd-section-label">Fruit and Veg Posters</p>
+      <div class="pair-grid">
+        <img src="images/gd-fruit.webp" alt="Fruit poster" loading="lazy">
+        <img src="images/gd-veg.webp" alt="Veg poster" loading="lazy">
+      </div>
+      <div class="project-desc" style="margin-top:1rem;">
+        <p>A pair of illustrated posters using a geometric, paper-cut style.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Christmas card -->
+    <div class="gd-section">
+      <p class="gd-section-label">Christmas Card</p>
+      <img class="single-img" src="images/gd-xmas.webp" alt="Pixel art Christmas card" loading="lazy">
+      <div class="project-desc" style="margin-top:1rem;">
+        <p>A pixel art Christmas card designed and sent to friends.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Pub + Jorts -->
+    <div class="gd-section">
+      <div class="pair-grid">
+        <div>
+          <p class="gd-section-label">Newsletter — Pub Invite</p>
+          <img src="images/gd-pub.webp" alt="Maybe we go to the pub newsletter" loading="lazy" style="width:100%;height:auto;display:block;">
+          <div class="project-desc" style="margin-top:1rem;">
+            <p>A newsletter invite to friends, asking if they maybe want to go to the pub. It could be fun!</p>
+          </div>
+        </div>
+        <div>
+          <p class="gd-section-label">A Jorts Summer</p>
+          <img src="images/gd-jorts.webp" alt="It's gonna be a jorts summer" loading="lazy" style="width:100%;height:auto;display:block;">
+          <div class="project-desc" style="margin-top:1rem;">
+            <p>It's literally gonna be a jorts summer.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2026 Christopher Howat</span>
+    <span>Glasgow, Scotland</span>
+  </footer>
+
+  <script src="trail.js"></script>
+  <script src="lightbox.js"></script>
+  <script src="grain.js"></script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>

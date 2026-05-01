@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MH4YEG8SJZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MH4YEG8SJZ');
+  </script>
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puffer Jacket Snoopy — Christopher Howat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap"></noscript>
+  <link rel="stylesheet" href="project.css">
+  <style>
+    /* Three-column grid for the square screenshots */
+    .snoopy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .snoopy-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Portrait video centred and capped in width */
+    .video-portrait-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .video-portrait-wrap video {
+      max-width: 360px;
+      width: 100%;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .snoopy-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#about" class="nav-link">About</a>
+    <a href="index.html#projects" class="nav-link active">Work</a>
+    <a href="index.html#experience" class="nav-link">Experience</a>
+    <a href="index.html#contact" class="nav-link">Contact</a>
+  </nav>
+
+  <div class="project-page">
+
+    <a href="index.html#projects" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      All Projects
+    </a>
+
+    <div class="project-header">
+      <p class="project-eyebrow">3D Design · 3D Printing · Blender · AR</p>
+      <h1 class="project-title">Puffer Jacket Snoopy</h1>
+      <div class="project-meta">
+        <span class="meta-tag">3D Design</span>
+        <span class="meta-tag">3D Printing</span>
+        <span class="meta-tag">Blender</span>
+        <span class="meta-tag">Sculpting</span>
+        <span class="meta-tag">AR Filter</span>
+        <span class="meta-tag">Personal Project</span>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <img
+      class="project-hero"
+      src="images/snoopy-3d-design.webp"
+      alt="Painted 3D printed Puffer Jacket Snoopy"
+    >
+
+    <hr class="divider">
+
+    <!-- ── Reference ─────────────────────────────────────────────── -->
+    <h2 style="font-family:'Little Character',sans-serif; font-size:1.6rem; color:var(--red); margin-bottom:1rem;">Reference</h2>
+
+    <div class="gallery">
+      <div class="gallery-item">
+        <img src="images/snoopy-reference.webp" alt="Original Peanuts comic — Snoopy in a puffer jacket" loading="lazy">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── 3D Model ───────────────────────────────────────────────── -->
+    <h2 style="font-family:'Little Character',sans-serif; font-size:1.6rem; color:var(--red); margin-bottom:1rem;">3D Model</h2>
+
+    <div class="snoopy-grid">
+      <img src="images/snoopy-screenshot-1.webp" alt="Blender 3D model screenshot" loading="lazy">
+      <img src="images/snoopy-screenshot-2.webp" alt="Blender 3D model screenshot" loading="lazy">
+      <img src="images/snoopy-mould.webp" alt="Snoopy resin print on mould base" loading="lazy">
+      <img src="images/snoopy-cast.webp" alt="Unpainted resin cast of Snoopy" loading="lazy">
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── AR Filter ──────────────────────────────────────────────── -->
+    <h2 style="font-family:'Little Character',sans-serif; font-size:1.6rem; color:var(--red); margin-bottom:1rem;">AR Filter</h2>
+
+    <div class="video-portrait-wrap">
+      <video
+        src="images/snoopy-ar.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+
+    <div class="project-desc">
+      <h2>About the project</h2>
+      <p>
+        This started with a single panel from a Peanuts comic, Snoopy bundled up in a
+        puffer jacket, looking very cute. I wanted a physical version of it, but
+        no 3D model existed anywhere online, so I decided to make one myself.
+      </p>
+      <p>
+        I taught myself Blender from scratch specifically for this project, sculpting the
+        model by hand using the comic panel as reference. Once I was happy with the shape,
+        I 3D printed and hand-painted a version, and later made a silicone mould from a
+        resin print to cast additional copies.
+      </p>
+      <p>
+        I also rigged the model and built a TikTok AR filter with it, so the wee guy
+        walks around in a loop, which felt like the right way to see him brought to life.
+      </p>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2026 Christopher Howat</span>
+    <span>Glasgow, Scotland</span>
+  </footer>
+
+  <script src="trail.js"></script>
+  <script src="lightbox.js"></script>
+  <script src="grain.js"></script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>

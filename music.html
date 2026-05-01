@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MH4YEG8SJZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MH4YEG8SJZ');
+  </script>
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Composition — Christopher Howat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap"></noscript>
+  <link rel="stylesheet" href="project.css">
+  <style>
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      margin-top: 1.5rem;
+    }
+    .video-wrap iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Sheet music side-by-side */
+    .sheet-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+      align-items: start;
+    }
+
+    .sheet-grid figure {
+      margin: 0;
+    }
+
+    .sheet-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--border);
+    }
+
+    .sheet-grid figcaption {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ink);
+      opacity: 0.6;
+      margin-top: 0.4rem;
+    }
+
+    /* ── Custom audio player ───────────────────────── */
+    .audio-player {
+      margin-top: 1.5rem;
+      font-family: 'Space Mono', monospace;
+      user-select: none;
+      max-width: 660px;
+    }
+
+    .ap-label-bar {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .ap-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .ap-play-btn {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--red);
+      padding: 0;
+    }
+
+    .ap-play-btn:hover { color: #c4321d; }
+
+    .ap-play-btn svg {
+      fill: currentColor;
+      shape-rendering: crispEdges;
+    }
+
+    .ap-scrubber {
+      flex: 1;
+      cursor: pointer;
+      padding: 10px 0;
+    }
+
+    .ap-track {
+      height: 4px;
+      background: var(--border);
+      position: relative;
+    }
+
+    .ap-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--red);
+      width: 0%;
+      pointer-events: none;
+    }
+
+    .ap-thumb {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background: var(--red);
+      left: 0%;
+      pointer-events: none;
+    }
+
+    .ap-time {
+      flex-shrink: 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      .sheet-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#about" class="nav-link">About</a>
+    <a href="index.html#projects" class="nav-link active">Work</a>
+    <a href="index.html#experience" class="nav-link">Experience</a>
+    <a href="index.html#contact" class="nav-link">Contact</a>
+  </nav>
+
+  <div class="project-page">
+
+    <a href="index.html#projects" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      All Projects
+    </a>
+
+    <div class="project-header">
+      <p class="project-eyebrow">Audio · Composition</p>
+      <h1 class="project-title">Music Composition</h1>
+      <div class="project-meta">
+        <span class="meta-tag">Composition</span>
+        <span class="meta-tag">Redcat Creative</span>
+        <span class="meta-tag">Personal Projects</span>
+        <span class="meta-tag">Mixing</span>
+        <span class="meta-tag">Sound Design</span>
+      </div>
+    </div>
+
+    <div class="project-desc">
+      <h2>About the project</h2>
+      <p>
+        A selection of music I have composed, spanning work produced for
+        Redcat Creative and personal projects.
+      </p>
+      <p>
+        At Redcat Creative I composed original music for television productions,
+        working to client briefs and handling the full audio production pipeline
+        from brief to delivery.
+      </p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="project-desc">
+      <h2>Demo compilation</h2>
+    </div>
+
+    <div class="video-wrap">
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/uNJvIVcmh3M?si=x-66RQWUHcj6zKS6"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <hr class="divider">
+
+    <div class="project-desc">
+      <h2>Scottish Trad</h2>
+      <p>
+        Two original tunes written in the Scottish traditional style, a slip jig and a slide.
+        The audio is a short set of the two tunes along with The Jig Runrig, a traditional tune.
+      </p>
+    </div>
+
+    <div class="sheet-grid">
+      <figure>
+        <img src="images/trad-slide.webp" alt="Sheet music for Slide" loading="lazy">
+        <figcaption>Slide</figcaption>
+      </figure>
+      <figure>
+        <img src="images/trad-slip-jig.webp" alt="Sheet music for Slip Jig" loading="lazy">
+        <figcaption>Slip Jig</figcaption>
+      </figure>
+    </div>
+
+    <div class="audio-player" id="trad-player">
+      <div class="ap-label-bar">Trad Set / Slide / Slip Jig / The Jig Runrig</div>
+      <div class="ap-controls">
+        <button class="ap-play-btn" aria-label="Play"></button>
+        <div class="ap-scrubber" role="slider" aria-label="Seek">
+          <div class="ap-track">
+            <div class="ap-fill"></div>
+            <div class="ap-thumb"></div>
+          </div>
+        </div>
+        <span class="ap-time">0:00 / 0:00</span>
+      </div>
+      <audio id="trad-audio" src="images/trad-set.mp3" preload="metadata"></audio>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2026 Christopher Howat</span>
+    <span>Glasgow, Scotland</span>
+  </footer>
+
+  <script src="trail.js"></script>
+  <script src="lightbox.js"></script>
+  <script src="grain.js"></script>
+  <script src="favicon-anim.js"></script>
+  <script>
+  (function () {
+    const audio    = document.getElementById('trad-audio');
+    const playBtn  = document.querySelector('.ap-play-btn');
+    const fill     = document.querySelector('.ap-fill');
+    const thumb    = document.querySelector('.ap-thumb');
+    const timeEl   = document.querySelector('.ap-time');
+    const scrubber = document.querySelector('.ap-scrubber');
+    if (!audio) return;
+
+    // Pixel pyramid pointing right — each row is its own rect, widest in the middle
+    const PLAY_ICON  = '<svg width="16" height="20" viewBox="0 0 8 14" fill="currentColor" shape-rendering="crispEdges">' +
+      '<rect x="0" y="0"  width="2" height="2"/>' +
+      '<rect x="0" y="2"  width="4" height="2"/>' +
+      '<rect x="0" y="4"  width="6" height="2"/>' +
+      '<rect x="0" y="6"  width="8" height="2"/>' +
+      '<rect x="0" y="8"  width="6" height="2"/>' +
+      '<rect x="0" y="10" width="4" height="2"/>' +
+      '<rect x="0" y="12" width="2" height="2"/>' +
+    '</svg>';
+    // Pixel pause: two solid bars
+    const PAUSE_ICON = '<svg width="16" height="20" viewBox="0 0 10 14" fill="currentColor" shape-rendering="crispEdges">' +
+      '<rect x="0" y="0" width="4" height="14"/>' +
+      '<rect x="6" y="0" width="4" height="14"/>' +
+    '</svg>';
+    playBtn.innerHTML = PLAY_ICON;
+
+    function fmt(t) {
+      if (isNaN(t)) return '0:00';
+      const m = Math.floor(t / 60);
+      const s = String(Math.floor(t % 60)).padStart(2, '0');
+      return m + ':' + s;
+    }
+
+    function updateProgress() {
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      fill.style.width  = pct + '%';
+      thumb.style.left  = pct + '%';
+      timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+    }
+
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('loadedmetadata', updateProgress);
+    audio.addEventListener('play',  () => { playBtn.innerHTML = PAUSE_ICON; });
+    audio.addEventListener('pause', () => { playBtn.innerHTML = PLAY_ICON; });
+    audio.addEventListener('ended', () => { playBtn.innerHTML = PLAY_ICON; });
+
+    playBtn.addEventListener('click', () => {
+      audio.paused ? audio.play() : audio.pause();
+    });
+
+    function seekTo(e) {
+      const rect = scrubber.getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      if (audio.duration) audio.currentTime = pct * audio.duration;
+    }
+
+    let dragging = false;
+    scrubber.addEventListener('mousedown',  e => { dragging = true; seekTo(e); });
+    scrubber.addEventListener('touchstart', e => { dragging = true; seekTo(e.touches[0]); }, { passive: true });
+    document.addEventListener('mousemove',  e => { if (dragging) seekTo(e); });
+    document.addEventListener('touchmove',  e => { if (dragging) seekTo(e.touches[0]); }, { passive: true });
+    document.addEventListener('mouseup',    () => { dragging = false; });
+    document.addEventListener('touchend',   () => { dragging = false; });
+  })();
+  </script>
+</body>
+</html>
