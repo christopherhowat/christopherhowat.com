@@ -149,7 +149,14 @@
       "Bash(sips -r 270 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-r270.png)",
       "Bash(sips -Z 2000 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-2000.png)",
       "Bash(cwebp -q 88 \"/tmp/Gold Seal Leaflet Finished.pdf.png\" -o \"/Users/christopherhowat/Downloads/Portfolio Website/images/gs-leaflet.webp\")",
-      "Bash(ffmpeg -y -i \"/Users/christopherhowat/Downloads/Portfolio Website/images/me.gif\" -vf \"select=eq\\(n\\\\,0\\)\" -frames:v 1 \"/Users/christopherhowat/Downloads/Portfolio Website/images/me-frame1.png\")"
+      "Bash(ffmpeg -y -i \"/Users/christopherhowat/Downloads/Portfolio Website/images/me.gif\" -vf \"select=eq\\(n\\\\,0\\)\" -frames:v 1 \"/Users/christopherhowat/Downloads/Portfolio Website/images/me-frame1.png\")",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp\")",
+      "Bash(ffmpeg -i \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp\" -vf \"scale=800:-1\" -quality 80 \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp.tmp.webp\" -y)",
+      "Bash(sips -Z 800 \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp\")",
+      "Bash(ffmpeg -i \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp\" -vf \"scale=800:-1\" -c:v libvpx-vp9 -quality good -crf 33 \"/tmp/gd-jorts-resized.webp\" -y)",
+      "Bash(mv \"/tmp/gd-jorts-resized.webp\" \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp\")",
+      "Bash(ffmpeg -i \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp\" -vf \"scale=800:-1\" /tmp/gd-jorts.png -y)",
+      "Bash(cwebp -q 82 /tmp/gd-jorts.png -o \"/Users/christopherhowat/Downloads/Portfolio Website/images/gd-jorts.webp\")"
     ]
   }
 }

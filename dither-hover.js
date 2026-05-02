@@ -1,5 +1,7 @@
-/* dither-hover.js — Bayer-dither flash on project card hover
-   Loads a crossOrigin copy of each image so getImageData works on the live site. */
+/* dither-hover.js
+   On hover: Bayer-dithered version (red + cream) sweeps down over the card.
+   On leave: sweeps back up.
+   Uses a crossOrigin re-fetch so getImageData works on the live site. */
 (function () {
   const BAYER = [
     [ 0,  8,  2, 10],
@@ -7,29 +9,50 @@
     [ 3, 11,  1,  9],
     [15,  7, 13,  5]
   ];
-  const ON  = [224,  59,  34, 255]; // #e03b22 — red
-  const OFF = [255, 243, 229, 255]; // #FFF3E5 — cream
-  const BLOCK = 4;
+  const ON  = [255, 243, 229, 255]; // #FFF3E5 — cream
+  const OFF = [224,  59,  34, 255]; // #e03b22 — red
+  const BLOCK    = 2;   // canvas px per screen block (lower = finer dither)
+  const SWEEP_IN  = 380; // ms for hover sweep
+  const SWEEP_OUT = 260; // ms for leave sweep
 
-  function buildDither(img, dispW, dispH) {
-    const dw = Math.max(1, Math.round(dispW / BLOCK));
-    const dh = Math.max(1, Math.round(dispH / BLOCK));
+  function buildDither(img, dispW, dispH, block, posX, posY, invert) {
+    block = block || BLOCK;
+    posX = posX !== undefined ? posX : 0.5;
+    posY = posY !== undefined ? posY : 0.5;
+    invert = !!invert;
+    const dw = Math.max(1, Math.round(dispW / block));
+    const dh = Math.max(1, Math.round(dispH / block));
     const off = document.createElement('canvas');
     off.width = dw; off.height = dh;
     const oc = off.getContext('2d');
-    oc.drawImage(img, 0, 0, dw, dh);
+    // Replicate object-fit: cover with the correct object-position
+    const nw = img.naturalWidth;
+    const nh = img.naturalHeight;
+    const scale = Math.max(dw / nw, dh / nh);
+    const scaledW = nw * scale;
+    const scaledH = nh * scale;
+    const dx = (dw - scaledW) * posX;
+    const dy = (dh - scaledH) * posY;
+
+    const filter = img.dataset.ditherFilter || 'contrast(200%) brightness(105%)';
+    oc.filter = filter;
+    oc.drawImage(img, dx, dy, scaledW, scaledH);
     const src = oc.getImageData(0, 0, dw, dh).data;
     const out = new Uint8ClampedArray(dw * dh * 4);
     for (let y = 0; y < dh; y++) {
       for (let x = 0; x < dw; x++) {
         const i = (y * dw + x) * 4;
-        const lum = src[i] * 0.299 + src[i + 1] * 0.587 + src[i + 2] * 0.114;
+        const lum = src[i] * 0.299 + src[i+1] * 0.587 + src[i+2] * 0.114;
         const thr = (BAYER[y & 3][x & 3] / 16) * 255;
-        const col = lum > thr ? ON : OFF;
+        const col = (lum > thr) !== invert ? ON : OFF;
         out[i] = col[0]; out[i+1] = col[1]; out[i+2] = col[2]; out[i+3] = 255;
       }
     }
     return { imageData: new ImageData(out, dw, dh), dw, dh };
+  }
+
+  function easeInOut(t) {
+    return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
   }
 
   function setup(wrap) {
@@ -39,68 +62,101 @@
     const canvas = document.createElement('canvas');
     canvas.style.cssText =
       'position:absolute;inset:0;width:100%;height:100%;' +
-      'opacity:0;pointer-events:none;z-index:1;' +
+      'pointer-events:none;z-index:1;' +
       'image-rendering:pixelated;image-rendering:crisp-edges;';
     wrap.appendChild(canvas);
 
-    let cache = null;
-    let fadeTimer = null;
+    let cache  = null;
+    let ctx    = null;
+    let rafId  = null;
+    let progress = 0; // 0 = fully hidden, 1 = fully revealed (in canvas row units, normalised)
 
-    function applyDither(corsImg) {
-      const w = wrap.offsetWidth;
-      const h = wrap.offsetHeight;
-      if (!w || !h) return;
-      try {
-        cache = buildDither(corsImg, w, h);
-        canvas.width  = cache.dw;
-        canvas.height = cache.dh;
-        canvas.getContext('2d').putImageData(cache.imageData, 0, 0);
-      } catch (_) {
-        // Silently fails on file:// — works fine on the live site
+    function draw(rows) {
+      if (!cache || !ctx) return;
+      ctx.clearRect(0, 0, cache.dw, cache.dh);
+      if (rows > 0) {
+        ctx.putImageData(cache.imageData, 0, 0, 0, 0, cache.dw, Math.ceil(rows));
       }
+    }
+
+    function sweepTo(target, duration) {
+      if (rafId) cancelAnimationFrame(rafId);
+      const startProgress = progress;
+      const startTime = performance.now();
+      const delta = target - startProgress;
+      if (Math.abs(delta) < 0.001) return;
+
+      function step(now) {
+        const t = Math.min(1, (now - startTime) / duration);
+        progress = startProgress + delta * easeInOut(t);
+        draw(progress * cache.dh);
+        if (t < 1) {
+          rafId = requestAnimationFrame(step);
+        } else {
+          progress = target;
+          draw(progress * cache.dh);
+          rafId = null;
+        }
+      }
+      rafId = requestAnimationFrame(step);
     }
 
     function loadCORSAndDither() {
       if (cache) return;
       const src = img.currentSrc || img.src;
       if (!src || src.startsWith('data:')) return;
-      // Re-request with crossOrigin so getImageData is allowed
+
       const corsImg = new Image();
       corsImg.crossOrigin = 'anonymous';
-      corsImg.onload = () => applyDither(corsImg);
+      // Read object-position from the real DOM img before loading CORS copy
+      const kwMap = { left: 0, top: 0, center: 0.5, right: 1, bottom: 1 };
+      const parsePct = v => v in kwMap ? kwMap[v] : parseFloat(v) / 100;
+      const objPos = window.getComputedStyle(img).objectPosition.split(' ');
+      const posX = parsePct(objPos[0]);
+      const posY = parsePct(objPos[1] || objPos[0]);
+
+      corsImg.onload = () => {
+        const w = wrap.offsetWidth;
+        const h = wrap.offsetHeight;
+        if (!w || !h) return;
+        try {
+          const block = img.dataset.ditherBlock ? parseInt(img.dataset.ditherBlock) : undefined;
+          cache  = buildDither(corsImg, w, h, block, posX, posY, img.hasAttribute('data-dither-invert'));
+          canvas.width  = cache.dw;
+          canvas.height = cache.dh;
+          ctx = canvas.getContext('2d');
+        } catch (_) {
+          // Silently fails on file:// — works on live site
+        }
+      };
       corsImg.src = src;
     }
 
-    function flash() {
-      if (!cache) { loadCORSAndDither(); return; } // trigger load on first hover if not ready
-      clearTimeout(fadeTimer);
-      canvas.style.transition = 'none';
-      canvas.style.opacity = '1';
-      canvas.getBoundingClientRect(); // force reflow so snap commits before fade
-      fadeTimer = setTimeout(() => {
-        canvas.style.transition = 'opacity 0.45s ease';
-        canvas.style.opacity = '0';
-      }, 60);
-    }
+    wrap.addEventListener('mouseenter', () => {
+      if (!cache) { loadCORSAndDither(); return; }
+      sweepTo(1, SWEEP_IN);
+    });
 
-    // Pre-load CORS copy as cards scroll into view
-    const observe = () => {
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver(entries => {
-          if (!entries[0].isIntersecting) return;
-          io.disconnect();
-          if (img.complete && img.naturalWidth) loadCORSAndDither();
-          else img.addEventListener('load', loadCORSAndDither, { once: true });
-        }, { rootMargin: '300px' });
-        io.observe(wrap);
-      } else {
-        if (img.complete && img.naturalWidth) loadCORSAndDither();
-        else img.addEventListener('load', loadCORSAndDither, { once: true });
-      }
+    wrap.addEventListener('mouseleave', () => {
+      if (!cache) return;
+      sweepTo(0, SWEEP_OUT);
+    });
+
+    // Pre-load CORS copy as the card nears the viewport
+    const kick = () => {
+      if (img.complete && img.naturalWidth) loadCORSAndDither();
+      else img.addEventListener('load', loadCORSAndDither, { once: true });
     };
 
-    observe();
-    wrap.addEventListener('mouseenter', flash);
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect(); kick();
+      }, { rootMargin: '300px' });
+      io.observe(wrap);
+    } else {
+      kick();
+    }
   }
 
   function init() {
