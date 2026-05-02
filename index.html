@@ -447,22 +447,17 @@
     }
 
     .about-portrait {
-      width: 380px;
       display: block;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 3.8px;
+      font-size: 14px;
       line-height: 1.15;
       letter-spacing: 0.05em;
       white-space: pre;
       color: var(--red);
-      -webkit-text-stroke: 0.6px var(--red);
-      text-shadow: 0 0 1.5px var(--red);
-      -webkit-font-smoothing: none;
-      font-smooth: never;
-      -webkit-text-size-adjust: none;
-      text-size-adjust: none;
+      -webkit-text-stroke: 2.2px var(--red);
+      text-shadow: 0 0 5.5px var(--red);
+      zoom: 0.272;
       margin: 0;
-      overflow: hidden;
     }
 
     /* ── Projects ───────────────────────────────────────────────────── */
@@ -708,11 +703,8 @@
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .about-portrait-wrap { align-items: center; width: 100%; }
       .about-portrait {
-        width: min(310px, calc(100vw - 3rem));
-        font-size: min(3.1px, calc((100vw - 3rem) * 0.0094));
-        line-height: 1.15;
-        margin-left: auto;
-        margin-right: auto;
+        zoom: 0.222;
+        margin: 0 auto;
       }
       .projects-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .timeline-item { grid-template-columns: 1fr; gap: 0.5rem; }
