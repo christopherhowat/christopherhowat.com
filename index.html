@@ -170,7 +170,7 @@
 
     /* Hero text/buttons float above the GOL canvas */
     .hero-heading,
-    .hero-sub,
+    .hero-ticker,
     .hero-actions {
       position: relative;
       z-index: 3;
@@ -186,13 +186,35 @@
       margin-bottom: 2.5rem;
     }
 
-    .hero-sub {
-      font-size: 1rem;
+    .hero-ticker {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
       color: var(--muted);
       letter-spacing: 0.04em;
       margin-bottom: 3rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.8rem;
+      overflow: hidden;
+      white-space: nowrap;
+      mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    }
+
+    .hero-ticker-inner {
+      display: inline-block;
+      animation: ticker-scroll 30s linear infinite;
+    }
+
+    .hero-ticker-inner span {
+      display: inline-block;
+    }
+
+    .hero-ticker-inner .sep {
+      margin: 0 1.2em;
+      opacity: 0.4;
+    }
+
+    @keyframes ticker-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
 
     .hero-actions {
@@ -777,7 +799,11 @@
       graphic designer, and photographer<br>
       based in Glasgow.
     </h1>
-    <p class="hero-sub">Glasgow, Scotland</p>
+    <div class="hero-ticker" id="now-ticker">
+      <div class="hero-ticker-inner" id="now-ticker-inner">
+        <span id="now-ticker-content">Glasgow, Scotland</span>
+      </div>
+    </div>
     <div class="hero-actions">
       <a href="#projects" class="btn btn-primary pixel-btn">View My Work</a>
       <a href="mailto:hello@christopherhowat.com" class="btn btn-outline pixel-btn">Get in Touch</a>
@@ -1295,6 +1321,7 @@
   <script src="favicon-anim.js"></script>
   <script src="pixel-btn.js"></script>
   <script src="dither-hover.js"></script>
+  <script src="now-widget.js"></script>
   <script>
   </script>
 
