@@ -132,7 +132,23 @@
       "Bash(whois christopherhowat.com)",
       "Bash(dig christopherhowat.com A @dns1.p06.nsone.net +short)",
       "Bash(dig christopherhowat.com NS +short)",
-      "Bash(dig christopherhowat.com A +short)"
+      "Bash(dig christopherhowat.com A +short)",
+      "Bash(sips -s format png \"/Users/christopherhowat/Downloads/Portfolio/gold/IMG_9344.HEIC\" --out /tmp/gs-leaflet-photo.png)",
+      "Bash(gs -dNOPAUSE -dBATCH -sDEVICE=png16m -r200 -sOutputFile=/tmp/gs-leaflet.png \"/Users/christopherhowat/Downloads/Portfolio/gold/Gold Seal Leaflet Finished.pdf\")",
+      "Bash(sips -Z 2000 /tmp/gs-leaflet.png --out /tmp/gs-leaflet-2000.png)",
+      "Bash(sips -Z 2000 /tmp/gs-leaflet-photo.png --out /tmp/gs-leaflet-photo-2000.png)",
+      "Bash(cwebp -q 88 /tmp/gs-leaflet-2000.png -o \"/Users/christopherhowat/Downloads/Portfolio Website/images/gs-leaflet.webp\")",
+      "Bash(cwebp -q 88 /tmp/gs-leaflet-photo-2000.png -o \"/Users/christopherhowat/Downloads/Portfolio Website/images/gs-leaflet-photo.webp\")",
+      "Bash(sips -g orientation \"/Users/christopherhowat/Downloads/Portfolio/gold/IMG_9344.HEIC\")",
+      "Bash(sips -g pixelWidth -g pixelHeight /tmp/gs-leaflet.png)",
+      "Bash(ffmpeg -y -i \"/Users/christopherhowat/Downloads/Portfolio/gold/IMG_9344.HEIC\" -vf \"transpose=2\" /tmp/gs-leaflet-photo-fixed.png)",
+      "Bash(ffmpeg -y -i \"/Users/christopherhowat/Downloads/Portfolio/gold/IMG_9344.HEIC\" /tmp/gs-leaflet-photo-raw.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight /tmp/gs-leaflet-photo-raw.png)",
+      "Bash(sips -r 90 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-r90.png)",
+      "Bash(sips -r 180 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-r180.png)",
+      "Bash(sips -r 270 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-r270.png)",
+      "Bash(sips -Z 2000 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-2000.png)",
+      "Bash(cwebp -q 88 \"/tmp/Gold Seal Leaflet Finished.pdf.png\" -o \"/Users/christopherhowat/Downloads/Portfolio Website/images/gs-leaflet.webp\")"
     ]
   }
 }
