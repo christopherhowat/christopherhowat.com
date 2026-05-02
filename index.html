@@ -152,12 +152,28 @@
       padding: 8rem 2rem 5rem;
     }
 
+    /* CRT scanlines overlay on hero */
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.04) 2px,
+        rgba(0, 0, 0, 0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
     /* Hero text/buttons float above the GOL canvas */
     .hero-heading,
     .hero-sub,
     .hero-actions {
       position: relative;
-      z-index: 1;
+      z-index: 3;
     }
 
     .hero-heading {
@@ -1279,6 +1295,7 @@
   <script src="favicon-anim.js"></script>
   <script src="perimeter.js"></script>
   <script src="pixel-btn.js"></script>
+  <script src="dither-hover.js"></script>
   <script>
   </script>
 
