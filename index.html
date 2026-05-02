@@ -457,6 +457,8 @@
       color: var(--red);
       -webkit-text-stroke: 0.6px var(--red);
       text-shadow: 0 0 1.5px var(--red);
+      -webkit-font-smoothing: none;
+      font-smooth: never;
       margin: 0;
       overflow: hidden;
     }
@@ -702,7 +704,13 @@
       #projects .section-wrap { padding-bottom: 0 !important; }
       #hero { padding: 7rem 1.5rem 4rem; }
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .about-portrait { width: 280px; font-size: 2.8px; }
+      .about-portrait {
+        width: 340px;
+        font-size: 3.4px;
+        margin: 0 auto;
+        -webkit-font-smoothing: none;
+        font-smooth: never;
+      }
       .projects-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .timeline-item { grid-template-columns: 1fr; gap: 0.5rem; }
       footer { flex-direction: column; gap: 0.5rem; text-align: center; }
