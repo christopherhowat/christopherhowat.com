@@ -33,10 +33,11 @@
   }
 
   function makeItems(temp, spotify) {
+    const locBlock = temp
+      ? temp + ' @ ' + COORDS + ' (Glasgow, Scotland)'
+      : COORDS + ' (Glasgow, Scotland)';
     return [
-      { key: 'coords',   value: COORDS },
-      { key: 'location', value: 'Glasgow, Scotland' },
-      { key: 'temp',     value: temp || '',                         hidden: !temp },
+      { key: 'location', value: locBlock },
       { key: 'time',     value: ukTime() },
       { key: 'spotify',  value: spotify ? spotify.text : '',
                          url:   spotify ? spotify.url  : null,      hidden: !spotify },
