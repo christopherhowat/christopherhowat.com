@@ -1,8 +1,8 @@
-/* now-widget.js — CSS-animation ticker with RAF hover slow-down */
+/* now-widget.js — two-strip RAF marquee (Henry Codes pattern) */
 (function () {
   const SPOTIFY_URL = 'https://spotify-api-eight-ochre.vercel.app/api/now-playing';
-  const COORDS = "55°51'33.2\"N  4°17'46.1\"W";
-  const COPIES  = 6; // duplicated copies so the strip never visibly ends
+  const COORDS      = "55°51'33.2\"N  4°17'46.1\"W";
+  const COPIES      = 3; // copies per strip — keeps each strip wider than any viewport
 
   function ukTime() {
     return new Intl.DateTimeFormat('en-GB', {
@@ -40,13 +40,14 @@
       { key: 'location', value: locBlock },
       { key: 'time',     value: ukTime() },
       { key: 'spotify',  value: spotify ? spotify.text : '',
-                         url:   spotify ? spotify.url  : null,      hidden: !spotify },
+                         url:   spotify ? spotify.url  : null, hidden: !spotify },
     ];
   }
 
-  function buildInner(inner, items) {
-    inner.innerHTML = '';
-    for (let i = 0; i < COPIES * 2; i++) {
+  function makeStrip(items) {
+    const strip = document.createElement('div');
+    strip.className = 'ticker-strip';
+    for (let i = 0; i < COPIES; i++) {
       items.forEach(item => {
         if (item.hidden) return;
         const el = item.key === 'spotify'
@@ -59,18 +60,19 @@
           el.target = '_blank';
           el.rel = 'noopener noreferrer';
         }
-        inner.appendChild(el);
+        strip.appendChild(el);
         const sep = document.createElement('span');
         sep.className = 'sep';
         sep.textContent = '·';
-        inner.appendChild(sep);
+        strip.appendChild(sep);
       });
     }
+    return strip;
   }
 
-  function applyItems(inner, items) {
+  function applyItems(strip, items) {
     items.forEach(item => {
-      inner.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
+      strip.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
         if (item.hidden) {
           el.hidden = true;
         } else {
@@ -83,39 +85,61 @@
   }
 
   function startTicker(items) {
-    const inner = document.getElementById('now-ticker-inner');
     const ticker = document.getElementById('now-ticker');
-    if (!inner || !ticker) return null;
+    if (!ticker) return null;
 
-    buildInner(inner, items);
+    // Two strips side by side — same pattern as Henry's site
+    const stripA = makeStrip(items);
+    const stripB = makeStrip(items);
+    ticker.appendChild(stripA);
+    ticker.appendChild(stripB);
 
-    // Hover slow-down — desktop only (getAnimations may be empty on mobile/Safari)
-    const anim = inner.getAnimations()[0];
-    if (anim) {
-      const BASE_RATE = 1;
-      const SLOW_RATE = 0.2;
-      let currentRate = BASE_RATE;
-      let targetRate  = BASE_RATE;
+    const BASE_SPEED = 0.6; // px per frame at 60fps
+    const SLOW_SPEED = 0.12;
+    let speed         = BASE_SPEED;
+    let targetSpeed   = BASE_SPEED;
+    let pos           = 0;
+    let pendingUpdate = null;
 
-      ticker.addEventListener('mouseenter', () => { targetRate = SLOW_RATE; });
-      ticker.addEventListener('mouseleave',  () => { targetRate = BASE_RATE; });
+    ticker.addEventListener('mouseenter', () => { targetSpeed = SLOW_SPEED; });
+    ticker.addEventListener('mouseleave',  () => { targetSpeed = BASE_SPEED; });
 
-      (function raf() {
-        currentRate += (targetRate - currentRate) * 0.06;
-        if (Math.abs(currentRate - anim.playbackRate) > 0.001) {
-          anim.updatePlaybackRate(currentRate);
+    function tick() {
+      const w = stripA.offsetWidth;
+      if (w === 0) { requestAnimationFrame(tick); return; }
+
+      // Smooth speed interpolation
+      speed += (targetSpeed - speed) * 0.08;
+      pos   -= speed;
+
+      // When strip A has fully scrolled off left, reset and apply any queued update
+      if (pos <= -w) {
+        pos += w;
+        if (pendingUpdate) {
+          applyItems(stripA, pendingUpdate);
+          applyItems(stripB, pendingUpdate);
+          pendingUpdate = null;
         }
-        requestAnimationFrame(raf);
-      })();
+      }
+
+      // Both strips get the exact same transform — Henry's approach
+      const t = 'translate3d(' + pos + 'px, 0, 0)';
+      stripA.style.transform = t;
+      stripB.style.transform = t;
+
+      requestAnimationFrame(tick);
     }
+
+    requestAnimationFrame(tick);
 
     return {
       updateTime: function () {
-        applyItems(inner, [{ key: 'time', value: ukTime() }]);
+        const t = ukTime();
+        applyItems(stripA, [{ key: 'time', value: t }]);
+        applyItems(stripB, [{ key: 'time', value: t }]);
       },
-      updateSpotify: function (newItems) {
-        // Apply off-screen — safe because content repeats; no visible jump
-        applyItems(inner, newItems);
+      queueUpdate: function (newItems) {
+        pendingUpdate = newItems;
       },
     };
   }
@@ -127,7 +151,7 @@
     setInterval(() => ticker.updateTime(), 1000);
     setInterval(async () => {
       const track = await fetchSpotify();
-      ticker.updateSpotify(makeItems(temp, track));
+      ticker.queueUpdate(makeItems(temp, track));
     }, 30000);
   }
 

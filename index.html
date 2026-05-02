@@ -193,44 +193,55 @@
       letter-spacing: 0.04em;
       margin-bottom: 3rem;
       overflow: hidden;
-      mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-      -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+      white-space: nowrap;
     }
 
-    .hero-ticker-inner {
+    /* Fade edges without mask-image — mask blocks GPU compositing on Safari */
+    .hero-ticker::before,
+    .hero-ticker::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 6%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .hero-ticker::before {
+      left: 0;
+      background: linear-gradient(to right, var(--cream), transparent);
+    }
+    .hero-ticker::after {
+      right: 0;
+      background: linear-gradient(to left, var(--cream), transparent);
+    }
+
+    .ticker-strip {
       display: inline-block;
       white-space: nowrap;
       will-change: transform;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      animation: ticker-scroll 60s linear infinite;
     }
 
-    .hero-ticker-inner span,
-    .hero-ticker-inner a {
+    .ticker-strip span,
+    .ticker-strip a {
       display: inline-block;
       font-family: 'Space Mono', monospace;
       font-size: 0.75rem;
       white-space: nowrap;
     }
 
-    .hero-ticker-inner a {
+    .ticker-strip a {
       color: var(--red);
       text-decoration: none;
     }
 
-    .hero-ticker-inner a:hover {
+    .ticker-strip a:hover {
       text-decoration: underline;
     }
 
-    .hero-ticker-inner .sep {
+    .ticker-strip .sep {
       margin: 0 1.2em;
       opacity: 0.4;
-    }
-
-    @keyframes ticker-scroll {
-      from { transform: translate3d(0, 0, 0); }
-      to   { transform: translate3d(-50%, 0, 0); }
     }
 
 
@@ -816,9 +827,7 @@
       graphic designer, and photographer<br>
       based in Glasgow.
     </h1>
-    <div class="hero-ticker" id="now-ticker">
-      <div class="hero-ticker-inner" id="now-ticker-inner"></div>
-    </div>
+    <div class="hero-ticker" id="now-ticker"></div>
     <div class="hero-actions">
       <a href="#projects" class="btn btn-primary pixel-btn">View My Work</a>
       <a href="mailto:hello@christopherhowat.com" class="btn btn-outline pixel-btn">Get in Touch</a>
