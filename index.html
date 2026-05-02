@@ -220,12 +220,14 @@
 
     #ticker-runner {
       display: flex;
+      flex-wrap: nowrap;
       will-change: transform;
     }
 
     .ticker-strip {
       flex-shrink: 0;
       white-space: nowrap;
+      min-width: max-content;
     }
 
     .ticker-strip span,
