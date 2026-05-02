@@ -37,10 +37,13 @@
   svg.appendChild(rect);
   document.body.appendChild(svg);
 
-  // Flicker by advancing the seed ~15fps
-  let seed = 0, frame = 0;
-  (function tick() {
-    if (++frame % 4 === 0) turb.setAttribute('seed', seed = (seed + 1) % 999);
-    requestAnimationFrame(tick);
-  })();
+  // Flicker by advancing the seed — skip on touch-only devices (no benefit, costs GPU)
+  // Run at ~10fps (every 6 frames) instead of 15fps to reduce SVG filter repaint cost
+  if (window.matchMedia('(pointer: fine)').matches) {
+    let seed = 0, frame = 0;
+    (function tick() {
+      if (++frame % 6 === 0) turb.setAttribute('seed', seed = (seed + 1) % 999);
+      requestAnimationFrame(tick);
+    })();
+  }
 })();

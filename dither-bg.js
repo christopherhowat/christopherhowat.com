@@ -77,8 +77,8 @@ void main() {
 
   const canvas = document.getElementById('dither-bg');
   if (!canvas) return;
-  const pr = window.devicePixelRatio || 1;
-  const gl = canvas.getContext('webgl2', { alpha: true, antialias: false });
+  const pr = Math.min(2, window.devicePixelRatio || 1); // cap at 2× — 3× DPR triples shader cost
+  const gl = canvas.getContext('webgl2', { alpha: true, antialias: false, powerPreference: 'low-power' });
   if (!gl) return;
 
   function compile(type, src) {
