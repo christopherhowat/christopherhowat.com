@@ -97,12 +97,12 @@
     runner.appendChild(stripB);
     ticker.appendChild(runner);
 
-    const BASE_SPEED = 0.6; // px per frame at 60fps
+    const BASE_SPEED = 0.6;
     const SLOW_SPEED = 0.12;
     let speed         = BASE_SPEED;
     let targetSpeed   = BASE_SPEED;
     let pos           = 0;
-    let stripWidth    = 0; // cached — only re-read when content changes
+    let stripWidth    = 0;
     let pendingUpdate = null;
 
     ticker.addEventListener('mouseenter', () => { targetSpeed = SLOW_SPEED; });
@@ -125,11 +125,10 @@
           applyItems(stripA, pendingUpdate);
           applyItems(stripB, pendingUpdate);
           pendingUpdate = null;
-          measureWidth(); // re-cache after content change
+          measureWidth();
         }
       }
 
-      // Single transform write on the runner — one GPU layer, one style mutation
       runner.style.transform = 'translate3d(' + pos + 'px, 0, 0)';
       requestAnimationFrame(tick);
     }
