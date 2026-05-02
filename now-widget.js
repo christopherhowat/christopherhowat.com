@@ -35,28 +35,69 @@
     try {
       const r = await fetch(SPOTIFY_URL);
       const d = await r.json();
-      if (d.isPlaying && d.title) return 'Now playing: ' + d.title + ' — ' + d.artist + ' ▶';
+      if (d.isPlaying && d.title) return 'Now playing: ' + d.title + ' — ' + d.artist;
     } catch (_) {}
     return null;
   }
 
-  function buildItems(temp, spotify) {
-    const coords = toDMS(LAT, 'N', 'S') + '  ' + toDMS(LON, 'E', 'W');
-    const items = [coords, 'Glasgow, Scotland'];
-    if (temp) items.push(temp);
-    items.push(ukTime());
-    if (spotify) items.push(spotify);
-    return items;
-  }
-
-  function renderTicker(items) {
+  // Build the ticker DOM once — 6 copies for seamless loop, items tagged with data-key
+  function buildTicker(items) {
     const inner = document.getElementById('now-ticker-inner');
     if (!inner) return;
 
-    const sep = '<span class="sep">·</span>';
-    const content = items.map(i => '<span>' + i + '</span>').join(sep);
-    // Duplicate for seamless loop
-    inner.innerHTML = content + sep + content + sep;
+    const sep = () => { const s = document.createElement('span'); s.className = 'sep'; s.textContent = '·'; return s; };
+
+    const COPIES = 6;
+    inner.innerHTML = '';
+
+    for (let c = 0; c < COPIES; c++) {
+      items.forEach((item, i) => {
+        const span = document.createElement('span');
+        span.dataset.key = item.key;
+        if (item.hidden) span.hidden = true;
+        span.textContent = item.value;
+        inner.appendChild(span);
+        inner.appendChild(sep());
+      });
+    }
+  }
+
+  // Update only the text/visibility of existing spans — animation never resets
+  function updateTicker(items) {
+    const inner = document.getElementById('now-ticker-inner');
+    if (!inner) return;
+    items.forEach(item => {
+      inner.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
+        el.textContent = item.value;
+        el.hidden = !!item.hidden;
+      });
+    });
+  }
+
+  function initHover() {
+    const ticker = document.getElementById('now-ticker');
+    const inner  = document.getElementById('now-ticker-inner');
+    if (!ticker || !inner) return;
+
+    ticker.addEventListener('mouseenter', () => {
+      const anim = inner.getAnimations()[0];
+      if (anim) anim.updatePlaybackRate(0.25);
+    });
+    ticker.addEventListener('mouseleave', () => {
+      const anim = inner.getAnimations()[0];
+      if (anim) anim.updatePlaybackRate(1);
+    });
+  }
+
+  function makeItems(temp, spotify) {
+    const coords = toDMS(LAT, 'N', 'S') + '  ' + toDMS(LON, 'E', 'W');
+    return [
+      { key: 'coords',   value: coords },
+      { key: 'location', value: 'Glasgow, Scotland' },
+      { key: 'temp',     value: temp || '',  hidden: !temp },
+      { key: 'time',     value: ukTime() },
+      { key: 'spotify',  value: spotify || '', hidden: !spotify },
+    ];
   }
 
   async function init() {
@@ -64,12 +105,13 @@
     if (!inner) return;
 
     const [temp, spotify] = await Promise.all([fetchTemp(), fetchSpotify()]);
-    renderTicker(buildItems(temp, spotify));
+    buildTicker(makeItems(temp, spotify));
+    initHover();
 
-    // Keep clock ticking — rebuild ticker every 30s
+    // Update time + Spotify every 30s — no DOM rebuild, animation keeps rolling
     setInterval(async () => {
       const track = await fetchSpotify();
-      renderTicker(buildItems(temp, track));
+      updateTicker(makeItems(temp, track));
     }, 30000);
   }
 

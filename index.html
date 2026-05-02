@@ -200,11 +200,14 @@
 
     .hero-ticker-inner {
       display: inline-block;
-      animation: ticker-scroll 30s linear infinite;
+      animation: ticker-scroll 60s linear infinite;
+      will-change: transform;
     }
 
     .hero-ticker-inner span {
       display: inline-block;
+      font-size: 0.75rem;
+      white-space: nowrap;
     }
 
     .hero-ticker-inner .sep {
