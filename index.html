@@ -704,9 +704,10 @@
       #projects .section-wrap { padding-bottom: 0 !important; }
       #hero { padding: 7rem 1.5rem 4rem; }
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-portrait-wrap { align-items: center; }
       .about-portrait {
-        width: 340px;
-        font-size: 3.4px;
+        width: min(320px, calc(100vw - 3rem));
+        font-size: min(3.2px, calc((100vw - 3rem) * 0.0097));
         margin: 0 auto;
         -webkit-font-smoothing: none;
         font-smooth: never;
