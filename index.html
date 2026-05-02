@@ -456,11 +456,26 @@
       line-height: 1.15;
       letter-spacing: 0.05em;
       white-space: pre;
-      color: var(--red);
-      -webkit-text-stroke: 2.2px var(--red);
-      text-shadow: 0 0 5.5px var(--red);
+      color: var(--ink);
+      -webkit-text-stroke: 2.2px var(--ink);
+      text-shadow: 0 0 5.5px var(--ink);
       transform-origin: top left;
       margin: 0;
+    }
+
+    /* ── Cat ────────────────────────────────────────────────────────── */
+    .cat-stage {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      margin: 0;
+    }
+    #cat-canvas {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
 
     /* ── Projects ───────────────────────────────────────────────────── */
@@ -901,9 +916,12 @@
           </div>
         </div>
       </div>
-    </div>
+        </div>
   </div>
 
+  <div class="cat-stage">
+    <canvas id="cat-canvas" width="64" height="48"></canvas>
+  </div>
   <hr class="divider">
 
   <!-- ── Projects ─────────────────────────────────────────────────── -->
@@ -1799,6 +1817,7 @@
       }, 180);
     })();
   </script>
+  <script src="cat.js"></script>
 
 </body>
 </html>

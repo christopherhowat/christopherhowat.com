@@ -168,7 +168,11 @@
       "Bash(curl -sf https://spotify-api-eight-ochre.vercel.app/api/now-playing)",
       "Bash(curl -sv https://spotify-api-eight-ochre.vercel.app/api/now-playing)",
       "Bash(curl -sI https://spotify-api-eight-ochre.vercel.app/api/now-playing)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(node -e ' *)",
+      "Bash(python3)",
+      "Read(//private/tmp/**)",
+      "Bash(node --check '/Users/christopherhowat/Downloads/Portfolio Website/cat.js')"
     ]
   }
 }
