@@ -88,26 +88,25 @@
 
     buildInner(inner, items);
 
-    // Get the CSS animation object
+    // Hover slow-down — desktop only (getAnimations may be empty on mobile/Safari)
     const anim = inner.getAnimations()[0];
-    if (!anim) return null;
+    if (anim) {
+      const BASE_RATE = 1;
+      const SLOW_RATE = 0.2;
+      let currentRate = BASE_RATE;
+      let targetRate  = BASE_RATE;
 
-    const BASE_RATE = 1;
-    const SLOW_RATE = 0.2;
-    let currentRate = BASE_RATE;
-    let targetRate  = BASE_RATE;
+      ticker.addEventListener('mouseenter', () => { targetRate = SLOW_RATE; });
+      ticker.addEventListener('mouseleave',  () => { targetRate = BASE_RATE; });
 
-    ticker.addEventListener('mouseenter', () => { targetRate = SLOW_RATE; });
-    ticker.addEventListener('mouseleave',  () => { targetRate = BASE_RATE; });
-
-    // RAF loop to smoothly interpolate playback rate
-    (function raf() {
-      currentRate += (targetRate - currentRate) * 0.06;
-      if (Math.abs(currentRate - anim.playbackRate) > 0.001) {
-        anim.updatePlaybackRate(currentRate);
-      }
-      requestAnimationFrame(raf);
-    })();
+      (function raf() {
+        currentRate += (targetRate - currentRate) * 0.06;
+        if (Math.abs(currentRate - anim.playbackRate) > 0.001) {
+          anim.updatePlaybackRate(currentRate);
+        }
+        requestAnimationFrame(raf);
+      })();
+    }
 
     return {
       updateTime: function () {
