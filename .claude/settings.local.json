@@ -126,7 +126,13 @@
       "Bash(ffmpeg -y -i \"/Users/christopherhowat/Downloads/Portfolio Website/images/me.gif\" /tmp/gif_frames/frame%02d.png)",
       "Bash(ffprobe -v quiet -show_format \"/Users/christopherhowat/Downloads/Portfolio Website/images/me.webm\")",
       "Bash(ffmpeg -y -framerate 5 -i /tmp/gif_frames/frame%02d.png -c:v libvpx-vp9 -pix_fmt yuva420p -auto-alt-ref 0 -b:v 0 -crf 18 -r 5 -t 1.2 -g 1 '/Users/christopherhowat/Downloads/Portfolio Website/images/me.webm')",
-      "Bash(ffmpeg -y -framerate 5 -i /tmp/gif_frames/frame%02d.png -c:v libvpx -pix_fmt yuva420p -auto-alt-ref 0 -b:v 600k -r 5 -t 1.2 -g 1 '/Users/christopherhowat/Downloads/Portfolio Website/images/me.webm')"
+      "Bash(ffmpeg -y -framerate 5 -i /tmp/gif_frames/frame%02d.png -c:v libvpx -pix_fmt yuva420p -auto-alt-ref 0 -b:v 600k -r 5 -t 1.2 -g 1 '/Users/christopherhowat/Downloads/Portfolio Website/images/me.webm')",
+      "Bash(dig christopherhowat.com +short)",
+      "Bash(dig www.christopherhowat.com +short)",
+      "Bash(whois christopherhowat.com)",
+      "Bash(dig christopherhowat.com A @dns1.p06.nsone.net +short)",
+      "Bash(dig christopherhowat.com NS +short)",
+      "Bash(dig christopherhowat.com A +short)"
     ]
   }
 }
