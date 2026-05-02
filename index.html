@@ -446,6 +446,9 @@
       justify-content: flex-start;
     }
 
+    #ascii-wrap {
+      overflow: hidden;
+    }
     .about-portrait {
       display: block;
       font-family: 'Courier New', Courier, monospace;
@@ -456,7 +459,7 @@
       color: var(--red);
       -webkit-text-stroke: 2.2px var(--red);
       text-shadow: 0 0 5.5px var(--red);
-      zoom: 0.272;
+      transform-origin: top left;
       margin: 0;
     }
 
@@ -702,10 +705,7 @@
       #hero { padding: 7rem 1.5rem 4rem; }
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .about-portrait-wrap { align-items: center; width: 100%; }
-      .about-portrait {
-        zoom: 0.222;
-        margin: 0 auto;
-      }
+      #ascii-wrap { margin: 0 auto; }
       .projects-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .timeline-item { grid-template-columns: 1fr; gap: 0.5rem; }
       footer { flex-direction: column; gap: 0.5rem; text-align: center; }
@@ -881,7 +881,7 @@
         </div>
         <!-- Right: portrait + skills -->
         <div class="about-portrait-wrap">
-          <pre id="ascii-portrait" class="about-portrait" aria-label="Christopher Howat"></pre>
+          <div id="ascii-wrap"><pre id="ascii-portrait" class="about-portrait" aria-label="Christopher Howat"></pre></div>
           <div style="margin-top:1.5rem; width:100%;">
             <p class="skills-eyebrow">Skills</p>
             <div class="skills-wrap">
@@ -1769,10 +1769,30 @@
 
       const PROCESSED = ASCII_FRAMES.map(stripBg);
 
-      const el = document.getElementById('ascii-portrait');
-      if (!el) return;
+      const el   = document.getElementById('ascii-portrait');
+      const wrap = document.getElementById('ascii-wrap');
+      if (!el || !wrap) return;
+
+      function applyAsciiScale() {
+        el.style.transform = '';           // reset so we can measure natural size
+        const nW = el.scrollWidth;
+        const nH = el.scrollHeight;
+        if (!nW || !nH) return;
+        const isMobile = window.innerWidth <= 768;
+        const targetW  = isMobile
+          ? Math.min(300, window.innerWidth - 48)
+          : 380;
+        const scale = targetW / nW;
+        el.style.transform = 'scale(' + scale + ')';
+        wrap.style.width  = Math.round(nW * scale) + 'px';
+        wrap.style.height = Math.round(nH * scale) + 'px';
+      }
+
       let frame = 0;
       el.textContent = PROCESSED[0];
+      requestAnimationFrame(applyAsciiScale);
+      window.addEventListener('resize', applyAsciiScale);
+
       setInterval(() => {
         frame = (frame + 1) % PROCESSED.length;
         el.textContent = PROCESSED[frame];
