@@ -1,4 +1,4 @@
-/* now-widget.js — scrolling ticker: location · weather · time · Spotify */
+/* now-widget.js — two-strip infinite ticker */
 (function () {
   const LAT = 55.8617;
   const LON = -4.2583;
@@ -35,58 +35,10 @@
     try {
       const r = await fetch(SPOTIFY_URL);
       const d = await r.json();
-      if (d.isPlaying && d.title) return 'Now playing: ' + d.title + ' — ' + d.artist;
+      if (d.isPlaying && d.title)
+        return { text: 'Now playing: ' + d.title + ' — ' + d.artist, url: d.url };
     } catch (_) {}
     return null;
-  }
-
-  // Build the ticker DOM once — 6 copies for seamless loop, items tagged with data-key
-  function buildTicker(items) {
-    const inner = document.getElementById('now-ticker-inner');
-    if (!inner) return;
-
-    const sep = () => { const s = document.createElement('span'); s.className = 'sep'; s.textContent = '·'; return s; };
-
-    const COPIES = 6;
-    inner.innerHTML = '';
-
-    for (let c = 0; c < COPIES; c++) {
-      items.forEach((item, i) => {
-        const span = document.createElement('span');
-        span.dataset.key = item.key;
-        if (item.hidden) span.hidden = true;
-        span.textContent = item.value;
-        inner.appendChild(span);
-        inner.appendChild(sep());
-      });
-    }
-  }
-
-  // Update only the text/visibility of existing spans — animation never resets
-  function updateTicker(items) {
-    const inner = document.getElementById('now-ticker-inner');
-    if (!inner) return;
-    items.forEach(item => {
-      inner.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
-        el.textContent = item.value;
-        el.hidden = !!item.hidden;
-      });
-    });
-  }
-
-  function initHover() {
-    const ticker = document.getElementById('now-ticker');
-    const inner  = document.getElementById('now-ticker-inner');
-    if (!ticker || !inner) return;
-
-    ticker.addEventListener('mouseenter', () => {
-      const anim = inner.getAnimations()[0];
-      if (anim) anim.updatePlaybackRate(0.25);
-    });
-    ticker.addEventListener('mouseleave', () => {
-      const anim = inner.getAnimations()[0];
-      if (anim) anim.updatePlaybackRate(1);
-    });
   }
 
   function makeItems(temp, spotify) {
@@ -94,24 +46,115 @@
     return [
       { key: 'coords',   value: coords },
       { key: 'location', value: 'Glasgow, Scotland' },
-      { key: 'temp',     value: temp || '',  hidden: !temp },
+      { key: 'temp',     value: temp || '',                          hidden: !temp },
       { key: 'time',     value: ukTime() },
-      { key: 'spotify',  value: spotify || '', hidden: !spotify },
+      { key: 'spotify',  value: spotify ? spotify.text : '',
+                         url:   spotify ? spotify.url  : null,       hidden: !spotify },
     ];
   }
 
+  function makeStrip(items) {
+    const strip = document.createElement('div');
+    strip.className = 'ticker-strip';
+    items.forEach(item => {
+      const el = item.key === 'spotify'
+        ? document.createElement('a')
+        : document.createElement('span');
+      el.dataset.key = item.key;
+      el.textContent = item.value;
+      if (item.hidden) el.hidden = true;
+      if (item.key === 'spotify' && item.url) {
+        el.href = item.url;
+        el.target = '_blank';
+        el.rel = 'noopener noreferrer';
+      }
+      strip.appendChild(el);
+      const sep = document.createElement('span');
+      sep.className = 'sep';
+      sep.textContent = '·';
+      strip.appendChild(sep);
+    });
+    return strip;
+  }
+
+  function applyItems(strip, items) {
+    items.forEach(item => {
+      strip.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
+        el.textContent = item.value;
+        el.hidden = !!item.hidden;
+        if (item.key === 'spotify') el.href = item.url || '';
+      });
+    });
+  }
+
+  function startTicker(items) {
+    const runner = document.getElementById('ticker-runner');
+    const ticker = document.getElementById('now-ticker');
+    if (!runner || !ticker) return null;
+
+    const BASE_SPEED = 0.4;
+    const SLOW_SPEED = 0.1;
+    let speed  = BASE_SPEED;
+    let target = BASE_SPEED;
+    let pendingItems = null;
+
+    ticker.addEventListener('mouseenter', () => { target = SLOW_SPEED; });
+    ticker.addEventListener('mouseleave',  () => { target = BASE_SPEED; });
+
+    const stripA = makeStrip(items);
+    const stripB = makeStrip(items);
+    runner.appendChild(stripA);
+    runner.appendChild(stripB);
+
+    let pos = 0;
+
+    function tick() {
+      // Always measure the current leading strip (children[0] changes after each swap)
+      const lead = runner.children[0];
+      if (!lead || lead.offsetWidth === 0) { requestAnimationFrame(tick); return; }
+      const stripWidth = lead.offsetWidth;
+
+      speed += (target - speed) * 0.08;
+      pos -= speed;
+
+      if (pos <= -stripWidth) {
+        pos += stripWidth;
+        // Update the back strip (children[1]) with any pending content — it's off-screen
+        if (pendingItems && runner.children[1]) {
+          applyItems(runner.children[1], pendingItems);
+          pendingItems = null;
+        }
+        // Rotate: move the front strip to the back
+        runner.appendChild(runner.children[0]);
+      }
+
+      runner.style.transform = 'translateX(' + pos + 'px)';
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    return {
+      updateTime: function () {
+        const t = ukTime();
+        applyItems(stripA, [{ key: 'time', value: t }]);
+        applyItems(stripB, [{ key: 'time', value: t }]);
+      },
+      queueSpotify: function (newItems) {
+        pendingItems = newItems;
+      },
+    };
+  }
+
   async function init() {
-    const inner = document.getElementById('now-ticker-inner');
-    if (!inner) return;
-
     const [temp, spotify] = await Promise.all([fetchTemp(), fetchSpotify()]);
-    buildTicker(makeItems(temp, spotify));
-    initHover();
+    const ticker = startTicker(makeItems(temp, spotify));
+    if (!ticker) return;
 
-    // Update time + Spotify every 30s — no DOM rebuild, animation keeps rolling
+    setInterval(() => ticker.updateTime(), 1000);
+
     setInterval(async () => {
       const track = await fetchSpotify();
-      updateTicker(makeItems(temp, track));
+      ticker.queueSpotify(makeItems(temp, track));
     }, 30000);
   }
 

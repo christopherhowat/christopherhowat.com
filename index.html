@@ -193,32 +193,42 @@
       letter-spacing: 0.04em;
       margin-bottom: 3rem;
       overflow: hidden;
-      white-space: nowrap;
       mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
       -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
     }
 
-    .hero-ticker-inner {
-      display: inline-block;
-      animation: ticker-scroll 60s linear infinite;
+    #ticker-runner {
+      display: inline-flex;
       will-change: transform;
     }
 
-    .hero-ticker-inner span {
+    .ticker-strip {
+      display: inline-block;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ticker-strip span,
+    .ticker-strip a {
       display: inline-block;
       font-size: 0.75rem;
       white-space: nowrap;
     }
 
-    .hero-ticker-inner .sep {
+    .ticker-strip a {
+      color: var(--red);
+      text-decoration: none;
+    }
+
+    .ticker-strip a:hover {
+      text-decoration: underline;
+    }
+
+    .ticker-strip .sep {
       margin: 0 1.2em;
       opacity: 0.4;
     }
 
-    @keyframes ticker-scroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
 
     .hero-actions {
       display: flex;
@@ -803,9 +813,7 @@
       based in Glasgow.
     </h1>
     <div class="hero-ticker" id="now-ticker">
-      <div class="hero-ticker-inner" id="now-ticker-inner">
-        <span id="now-ticker-content">Glasgow, Scotland</span>
-      </div>
+      <div id="ticker-runner"></div>
     </div>
     <div class="hero-actions">
       <a href="#projects" class="btn btn-primary pixel-btn">View My Work</a>
