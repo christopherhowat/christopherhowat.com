@@ -148,7 +148,8 @@
       "Bash(sips -r 180 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-r180.png)",
       "Bash(sips -r 270 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-r270.png)",
       "Bash(sips -Z 2000 /tmp/gs-leaflet-photo-raw.png --out /tmp/gs-leaflet-photo-2000.png)",
-      "Bash(cwebp -q 88 \"/tmp/Gold Seal Leaflet Finished.pdf.png\" -o \"/Users/christopherhowat/Downloads/Portfolio Website/images/gs-leaflet.webp\")"
+      "Bash(cwebp -q 88 \"/tmp/Gold Seal Leaflet Finished.pdf.png\" -o \"/Users/christopherhowat/Downloads/Portfolio Website/images/gs-leaflet.webp\")",
+      "Bash(ffmpeg -y -i \"/Users/christopherhowat/Downloads/Portfolio Website/images/me.gif\" -vf \"select=eq\\(n\\\\,0\\)\" -frames:v 1 \"/Users/christopherhowat/Downloads/Portfolio Website/images/me-frame1.png\")"
     ]
   }
 }

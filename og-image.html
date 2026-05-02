@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @font-face {
+      font-family: 'Little Character';
+      src: url('fonts/LittleCharacter-Regular.ttf') format('truetype');
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1200px;
+      height: 630px;
+      background: #FFF3E5;
+      font-family: 'Space Mono', monospace;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      width: 1200px;
+      height: 630px;
+      background: #FFF3E5;
+      padding: 80px 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: none;
+      position: relative;
+    }
+    .portrait {
+      position: absolute;
+      right: 100px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 340px;
+      height: 340px;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+    .top {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #e03b22;
+    }
+    h1 {
+      font-family: 'Little Character', sans-serif;
+      font-size: 96px;
+      line-height: 1;
+      color: #1a1a1a;
+    }
+    .subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8a7b6a;
+      margin-top: 8px;
+    }
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .tags {
+      display: flex;
+      gap: 10px;
+    }
+    .tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: #8a7b6a;
+      background: #f2ebe0;
+      border: 1px solid #e0d5c5;
+      padding: 6px 14px;
+      text-transform: uppercase;
+    }
+    .url {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: #8a7b6a;
+      text-transform: lowercase;
+    }
+    .accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+      background: #e03b22;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="card">
+    <div class="accent"></div>
+    <img src="images/me-frame1.png" class="portrait" alt="">
+    <div class="top">
+      <span class="eyebrow">Portfolio</span>
+      <h1>Christopher<br>Howat</h1>
+      <p class="subtitle">Graphic Designer · Glasgow</p>
+    </div>
+    <div class="bottom">
+      <div class="tags">
+        <span class="tag">Graphic Design</span>
+        <span class="tag">Photography</span>
+        <span class="tag">Web</span>
+      </div>
+      <span class="url">christopherhowat.com</span>
+    </div>
+  </div>
+</body>
+</html>
