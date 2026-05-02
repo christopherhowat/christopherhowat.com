@@ -1,17 +1,8 @@
-/* now-widget.js — two-strip infinite ticker */
+/* now-widget.js — CSS-animation ticker with RAF hover slow-down */
 (function () {
-  const LAT = 55.8617;
-  const LON = -4.2583;
   const SPOTIFY_URL = 'https://spotify-api-eight-ochre.vercel.app/api/now-playing';
-
-  function toDMS(val, pos, neg) {
-    const abs = Math.abs(val);
-    const d = Math.floor(abs);
-    const mFull = (abs - d) * 60;
-    const m = Math.floor(mFull);
-    const s = Math.round((mFull - m) * 60);
-    return (val >= 0 ? pos : neg) + ' ' + d + '° ' + m + "' " + s + '"';
-  }
+  const COORDS = "55°51'33.2\"N  4°17'46.1\"W";
+  const COPIES  = 6; // duplicated copies so the strip never visibly ends
 
   function ukTime() {
     return new Intl.DateTimeFormat('en-GB', {
@@ -23,8 +14,8 @@
   async function fetchTemp() {
     try {
       const r = await fetch(
-        'https://api.open-meteo.com/v1/forecast?latitude=' + LAT +
-        '&longitude=' + LON + '&current=temperature_2m'
+        'https://api.open-meteo.com/v1/forecast?latitude=55.8617' +
+        '&longitude=-4.2583&current=temperature_2m'
       );
       const d = await r.json();
       return Math.round(d.current.temperature_2m) + '°C';
@@ -42,105 +33,89 @@
   }
 
   function makeItems(temp, spotify) {
-    const coords = toDMS(LAT, 'N', 'S') + '  ' + toDMS(LON, 'E', 'W');
     return [
-      { key: 'coords',   value: coords },
+      { key: 'coords',   value: COORDS },
       { key: 'location', value: 'Glasgow, Scotland' },
-      { key: 'temp',     value: temp || '',                          hidden: !temp },
+      { key: 'temp',     value: temp || '',                         hidden: !temp },
       { key: 'time',     value: ukTime() },
       { key: 'spotify',  value: spotify ? spotify.text : '',
-                         url:   spotify ? spotify.url  : null,       hidden: !spotify },
+                         url:   spotify ? spotify.url  : null,      hidden: !spotify },
     ];
   }
 
-  function makeStrip(items) {
-    const strip = document.createElement('div');
-    strip.className = 'ticker-strip';
-    items.forEach(item => {
-      const el = item.key === 'spotify'
-        ? document.createElement('a')
-        : document.createElement('span');
-      el.dataset.key = item.key;
-      el.textContent = item.value;
-      if (item.hidden) el.hidden = true;
-      if (item.key === 'spotify' && item.url) {
-        el.href = item.url;
-        el.target = '_blank';
-        el.rel = 'noopener noreferrer';
-      }
-      strip.appendChild(el);
-      const sep = document.createElement('span');
-      sep.className = 'sep';
-      sep.textContent = '·';
-      strip.appendChild(sep);
-    });
-    return strip;
+  function buildInner(inner, items) {
+    inner.innerHTML = '';
+    for (let i = 0; i < COPIES * 2; i++) {
+      items.forEach(item => {
+        if (item.hidden) return;
+        const el = item.key === 'spotify'
+          ? document.createElement('a')
+          : document.createElement('span');
+        el.dataset.key = item.key;
+        el.textContent = item.value;
+        if (item.key === 'spotify' && item.url) {
+          el.href = item.url;
+          el.target = '_blank';
+          el.rel = 'noopener noreferrer';
+        }
+        inner.appendChild(el);
+        const sep = document.createElement('span');
+        sep.className = 'sep';
+        sep.textContent = '·';
+        inner.appendChild(sep);
+      });
+    }
   }
 
-  function applyItems(strip, items) {
+  function applyItems(inner, items) {
     items.forEach(item => {
-      strip.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
-        el.textContent = item.value;
-        el.hidden = !!item.hidden;
-        if (item.key === 'spotify') el.href = item.url || '';
+      inner.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
+        if (item.hidden) {
+          el.hidden = true;
+        } else {
+          el.hidden = false;
+          el.textContent = item.value;
+          if (item.key === 'spotify') el.href = item.url || '';
+        }
       });
     });
   }
 
   function startTicker(items) {
-    const runner = document.getElementById('ticker-runner');
+    const inner = document.getElementById('now-ticker-inner');
     const ticker = document.getElementById('now-ticker');
-    if (!runner || !ticker) return null;
+    if (!inner || !ticker) return null;
 
-    const BASE_SPEED = 0.4;
-    const SLOW_SPEED = 0.1;
-    let speed  = BASE_SPEED;
-    let target = BASE_SPEED;
-    let pendingItems = null;
+    buildInner(inner, items);
 
-    ticker.addEventListener('mouseenter', () => { target = SLOW_SPEED; });
-    ticker.addEventListener('mouseleave',  () => { target = BASE_SPEED; });
+    // Get the CSS animation object
+    const anim = inner.getAnimations()[0];
+    if (!anim) return null;
 
-    const stripA = makeStrip(items);
-    const stripB = makeStrip(items);
-    runner.appendChild(stripA);
-    runner.appendChild(stripB);
+    const BASE_RATE = 1;
+    const SLOW_RATE = 0.2;
+    let currentRate = BASE_RATE;
+    let targetRate  = BASE_RATE;
 
-    let pos = 0;
+    ticker.addEventListener('mouseenter', () => { targetRate = SLOW_RATE; });
+    ticker.addEventListener('mouseleave',  () => { targetRate = BASE_RATE; });
 
-    function tick() {
-      // Always measure the current leading strip (children[0] changes after each swap)
-      const lead = runner.children[0];
-      if (!lead || lead.offsetWidth === 0) { requestAnimationFrame(tick); return; }
-      const stripWidth = lead.offsetWidth;
-
-      speed += (target - speed) * 0.08;
-      pos -= speed;
-
-      if (pos <= -stripWidth) {
-        pos += stripWidth;
-        // Update the back strip (children[1]) with any pending content — it's off-screen
-        if (pendingItems && runner.children[1]) {
-          applyItems(runner.children[1], pendingItems);
-          pendingItems = null;
-        }
-        // Rotate: move the front strip to the back
-        runner.appendChild(runner.children[0]);
+    // RAF loop to smoothly interpolate playback rate
+    (function raf() {
+      currentRate += (targetRate - currentRate) * 0.06;
+      if (Math.abs(currentRate - anim.playbackRate) > 0.001) {
+        anim.updatePlaybackRate(currentRate);
       }
-
-      runner.style.transform = 'translateX(' + pos + 'px)';
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
+      requestAnimationFrame(raf);
+    })();
 
     return {
       updateTime: function () {
-        const t = ukTime();
-        applyItems(stripA, [{ key: 'time', value: t }]);
-        applyItems(stripB, [{ key: 'time', value: t }]);
+        applyItems(inner, [{ key: 'time', value: ukTime() }]);
       },
-      queueSpotify: function (newItems) {
-        pendingItems = newItems;
+      updateSpotify: function (newItems) {
+        // Apply off-screen — safe because content repeats; no visible jump
+        applyItems(inner, newItems);
       },
     };
   }
@@ -149,14 +124,16 @@
     const [temp, spotify] = await Promise.all([fetchTemp(), fetchSpotify()]);
     const ticker = startTicker(makeItems(temp, spotify));
     if (!ticker) return;
-
     setInterval(() => ticker.updateTime(), 1000);
-
     setInterval(async () => {
       const track = await fetchSpotify();
-      ticker.queueSpotify(makeItems(temp, track));
+      ticker.updateSpotify(makeItems(temp, track));
     }, 30000);
   }
 
-  init();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();

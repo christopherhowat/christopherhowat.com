@@ -197,36 +197,37 @@
       -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
     }
 
-    #ticker-runner {
-      display: inline-flex;
-      will-change: transform;
-    }
-
-    .ticker-strip {
+    .hero-ticker-inner {
       display: inline-block;
       white-space: nowrap;
-      flex-shrink: 0;
+      will-change: transform;
+      animation: ticker-scroll 60s linear infinite;
     }
 
-    .ticker-strip span,
-    .ticker-strip a {
+    .hero-ticker-inner span,
+    .hero-ticker-inner a {
       display: inline-block;
       font-size: 0.75rem;
       white-space: nowrap;
     }
 
-    .ticker-strip a {
+    .hero-ticker-inner a {
       color: var(--red);
       text-decoration: none;
     }
 
-    .ticker-strip a:hover {
+    .hero-ticker-inner a:hover {
       text-decoration: underline;
     }
 
-    .ticker-strip .sep {
+    .hero-ticker-inner .sep {
       margin: 0 1.2em;
       opacity: 0.4;
+    }
+
+    @keyframes ticker-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
 
 
@@ -813,7 +814,7 @@
       based in Glasgow.
     </h1>
     <div class="hero-ticker" id="now-ticker">
-      <div id="ticker-runner"></div>
+      <div class="hero-ticker-inner" id="now-ticker-inner"></div>
     </div>
     <div class="hero-actions">
       <a href="#projects" class="btn btn-primary pixel-btn">View My Work</a>
