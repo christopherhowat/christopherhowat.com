@@ -88,49 +88,54 @@
     const ticker = document.getElementById('now-ticker');
     if (!ticker) return null;
 
-    // Two strips side by side — same pattern as Henry's site
+    // Runner wraps both strips — we translate the runner (1 write/frame, not 2)
+    const runner = document.createElement('div');
+    runner.id = 'ticker-runner';
     const stripA = makeStrip(items);
     const stripB = makeStrip(items);
-    ticker.appendChild(stripA);
-    ticker.appendChild(stripB);
+    runner.appendChild(stripA);
+    runner.appendChild(stripB);
+    ticker.appendChild(runner);
 
     const BASE_SPEED = 0.6; // px per frame at 60fps
     const SLOW_SPEED = 0.12;
     let speed         = BASE_SPEED;
     let targetSpeed   = BASE_SPEED;
     let pos           = 0;
+    let stripWidth    = 0; // cached — only re-read when content changes
     let pendingUpdate = null;
 
     ticker.addEventListener('mouseenter', () => { targetSpeed = SLOW_SPEED; });
     ticker.addEventListener('mouseleave',  () => { targetSpeed = BASE_SPEED; });
 
-    function tick() {
+    function measureWidth() {
       const w = stripA.offsetWidth;
-      if (w === 0) { requestAnimationFrame(tick); return; }
+      if (w > 0) stripWidth = w;
+    }
 
-      // Smooth speed interpolation
+    function tick() {
+      if (stripWidth === 0) { measureWidth(); requestAnimationFrame(tick); return; }
+
       speed += (targetSpeed - speed) * 0.08;
       pos   -= speed;
 
-      // When strip A has fully scrolled off left, reset and apply any queued update
-      if (pos <= -w) {
-        pos += w;
+      if (pos <= -stripWidth) {
+        pos += stripWidth;
         if (pendingUpdate) {
           applyItems(stripA, pendingUpdate);
           applyItems(stripB, pendingUpdate);
           pendingUpdate = null;
+          measureWidth(); // re-cache after content change
         }
       }
 
-      // Both strips get the exact same transform — Henry's approach
-      const t = 'translate3d(' + pos + 'px, 0, 0)';
-      stripA.style.transform = t;
-      stripB.style.transform = t;
-
+      // Single transform write on the runner — one GPU layer, one style mutation
+      runner.style.transform = 'translate3d(' + pos + 'px, 0, 0)';
       requestAnimationFrame(tick);
     }
 
     requestAnimationFrame(tick);
+    window.addEventListener('resize', measureWidth);
 
     return {
       updateTime: function () {

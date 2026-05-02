@@ -23,8 +23,8 @@
   <meta name="description" content="Christopher Howat, Content creator, graphic designer, and photographer based in Glasgow.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"></noscript>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=block" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=block" rel="stylesheet"></noscript>
   <style>
     @font-face {
       font-family: 'Little Character';
@@ -54,6 +54,8 @@
       font-weight: 300;
       line-height: 1.6;
       overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
 
     /* ── Game of Life background ────────────────────────────────────── */
@@ -216,10 +218,14 @@
       background: linear-gradient(to left, var(--cream), transparent);
     }
 
-    .ticker-strip {
-      display: inline-block;
-      white-space: nowrap;
+    #ticker-runner {
+      display: flex;
       will-change: transform;
+    }
+
+    .ticker-strip {
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .ticker-strip span,
@@ -1130,7 +1136,7 @@
     // ─── Trail texture  (nm class) ────────────────────────────────────
     // A hidden 512×512 canvas accumulates radial gradients via screen-
     // blending, exactly like nm.drawTouch / nm.update in the source.
-    const TEX_SIZE  = 512;  // T = 512  (trailSize 0.1 >= 0.08)
+    const TEX_SIZE  = 256;  // 256 not 512 — getImageData reads 4× less data
     const MAX_AGE   = 250;  // maxAge: 250 ms
     const RADIUS    = 0.055;  // radius = trailSize (reduced for tighter spread)
     const INTENSITY = 0.2;  // intensity: 0.2
@@ -1283,6 +1289,8 @@
       // Set fillStyle once per frame, not inside the inner loop
       ctx.fillStyle = (window.scrollY + mouseClientY) >= _invTop ? '#FFF3E5' : '#e03b22';
 
+      // Batch all cells into one path + one fill call instead of one fillRect per cell
+      ctx.beginPath();
       for (let r = 0; r < GRID; r++) {
         for (let c = 0; c < GRID; c++) {
           const uvX = (c + 0.5) / GRID;
@@ -1295,7 +1303,7 @@
           if (brightness > 0.05) {
             const screenX = ((uvX - 0.5) / sx + 0.5) * W;
             const screenY = (0.5 - (uvY - 0.5) / sy) * H;
-            ctx.fillRect(
+            ctx.rect(
               Math.round(screenX - cellSize / 2),
               Math.round(screenY - cellSize / 2),
               Math.ceil(cellSize),
@@ -1304,6 +1312,7 @@
           }
         }
       }
+      ctx.fill();
 
       requestAnimationFrame(tick);
     }
