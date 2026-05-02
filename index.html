@@ -459,6 +459,8 @@
       text-shadow: 0 0 1.5px var(--red);
       -webkit-font-smoothing: none;
       font-smooth: never;
+      -webkit-text-size-adjust: none;
+      text-size-adjust: none;
       margin: 0;
       overflow: hidden;
     }
@@ -704,13 +706,13 @@
       #projects .section-wrap { padding-bottom: 0 !important; }
       #hero { padding: 7rem 1.5rem 4rem; }
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .about-portrait-wrap { align-items: center; }
+      .about-portrait-wrap { align-items: center; width: 100%; }
       .about-portrait {
-        width: min(320px, calc(100vw - 3rem));
-        font-size: min(3.2px, calc((100vw - 3rem) * 0.0097));
-        margin: 0 auto;
-        -webkit-font-smoothing: none;
-        font-smooth: never;
+        width: min(310px, calc(100vw - 3rem));
+        font-size: min(3.1px, calc((100vw - 3rem) * 0.0094));
+        line-height: 1.15;
+        margin-left: auto;
+        margin-right: auto;
       }
       .projects-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .timeline-item { grid-template-columns: 1fr; gap: 0.5rem; }
