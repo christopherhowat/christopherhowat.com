@@ -467,7 +467,7 @@
     .cat-stage {
       position: relative;
       width: 100%;
-      overflow: hidden;
+      overflow: visible;
       margin: 0;
     }
     #cat-canvas {
@@ -476,6 +476,21 @@
       left: 0;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
+      transform-origin: 50% 100%; /* flip around feet */
+    }
+    /* Fake pixel cursor shown while cat is active; hides real cursor */
+    body.cat-active,
+    body.cat-active * { cursor: none !important; }
+    #fake-cursor {
+      display: none;
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: #000;
+      pointer-events: none;
+      z-index: 10000;
+      image-rendering: pixelated;
+      /* transition applied by JS just before repulse */
     }
 
     /* ── Projects ───────────────────────────────────────────────────── */
@@ -919,6 +934,7 @@
         </div>
   </div>
 
+  <div id="fake-cursor"></div>
   <div class="cat-stage">
     <canvas id="cat-canvas" width="64" height="48"></canvas>
   </div>
