@@ -4,6 +4,8 @@
   const COORDS      = "55°51'33.2\"N  4°17'46.1\"W";
   const COPIES      = 3; // copies per strip — keeps each strip wider than any viewport
 
+  let lastTrack = null; // keeps last known track in memory across polls
+
   function ukTime() {
     return new Intl.DateTimeFormat('en-GB', {
       timeZone: 'Europe/London',
@@ -26,10 +28,12 @@
     try {
       const r = await fetch(SPOTIFY_URL);
       const d = await r.json();
-      if (d.isPlaying && d.title)
-        return { text: 'Now playing: ' + d.title + ' — ' + d.artist, url: d.url };
+      if (d.title && d.artist) {
+        const label = d.isPlaying ? 'Now playing' : 'Last played';
+        lastTrack = { text: label + ': ' + d.title + ' — ' + d.artist, url: d.url };
+      }
     } catch (_) {}
-    return null;
+    return lastTrack; // null only on very first load if Spotify has never been polled
   }
 
   function makeItems(temp, spotify) {
