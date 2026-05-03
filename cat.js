@@ -587,7 +587,8 @@
 
         case 'sit':
           drawFrame(ctx, SIT, SIT_SCALE);
-          if (!inCooldown && mouseDist < ATTRACT_DIST && mdy > -EYELINE_Y) {
+          if (!inCooldown && mouseDist < ATTRACT_DIST && mdy > -EYELINE_Y
+              && (facingRight ? mdx > 0 : mdx < 0)) {
             state = 'walk_to_mouse'; animIdx = 0; lastAt = now;
           }
           break;
