@@ -358,7 +358,7 @@
   const FRAME_MS        = 120;   // walk animation frame interval
   const BAT_FRAME_MS    = 80;    // each bat frame lasts this long
   const BAT_COOLDOWN_MS = 2000;  // ignore mouse for this long after batting
-  const WALK_SPD        = 3;
+  const WALK_SPD        = 180;   // px/sec at a 1000px-wide stage (scales with stage width)
   const SIT_DIST        = 20;    // px — close enough to sit
   const ATTRACT_DIST    = 280;   // px — mouse must be within this to attract her
   const BAT_DIST        = 90;    // px — close enough to start swiping
@@ -434,7 +434,10 @@
         sitUntil = now + delay;
       }
 
+      let prevNow = 0;
       function mobileTick (now) {
+        const dt = prevNow ? Math.min((now - prevNow) / 1000, 0.1) : 1 / 60;
+        prevNow = now;
         if (lastAt === 0) { lastAt = now; scheduleWander(now); }
 
         switch (state) {
@@ -455,8 +458,9 @@
               drawFrame(ctx, SIT, SIT_SCALE);
               scheduleWander(now);
             } else {
+              const spd = WALK_SPD * dt * (stage.offsetWidth / 1000);
               if (now - lastAt > FRAME_MS) { animIdx = (animIdx + 1) % WALK.length; lastAt = now; }
-              catX += Math.sign(dx) * Math.min(WALK_SPD, d);
+              catX += Math.sign(dx) * Math.min(spd, d);
               setFacing(dx >= 0);
               drawFrame(ctx, WALK[animIdx], WALK_SCALE);
             }
@@ -574,7 +578,11 @@
       }, 450);
     }
 
+    let prevNow = 0;
     function tick (now) {
+      const dt        = prevNow ? Math.min((now - prevNow) / 1000, 0.1) : 1 / 60;
+      prevNow = now;
+      const spd       = WALK_SPD * dt * (stage.offsetWidth / 1000);
       const sr        = stage.getBoundingClientRect();
       const catVX     = sr.left + catX + CANVAS_W / 2;
       const catVY     = sr.top  + CANVAS_H / 2;
@@ -610,7 +618,7 @@
           const dx = tx - catX;
           const d  = Math.abs(dx);
           if (now - lastAt > FRAME_MS) { animIdx = (animIdx + 1) % WALK.length; lastAt = now; }
-          catX += Math.sign(dx) * Math.min(WALK_SPD, d);
+          catX += Math.sign(dx) * Math.min(spd, d);
           setFacing(dx >= 0);
           drawFrame(ctx, WALK[animIdx], WALK_SCALE);
           break;
@@ -646,7 +654,7 @@
             drawFrame(ctx, SIT, SIT_SCALE);
           } else {
             if (now - lastAt > FRAME_MS) { animIdx = (animIdx + 1) % WALK.length; lastAt = now; }
-            catX += Math.sign(dx) * Math.min(WALK_SPD, d);
+            catX += Math.sign(dx) * Math.min(spd, d);
             setFacing(dx >= 0);
             drawFrame(ctx, WALK[animIdx], WALK_SCALE);
           }
