@@ -246,10 +246,10 @@
     "         kkkkkkkkkdlddddllllllllllddlddlllllllllllllddddkkkwwwwwwwwwwwwwkkkkkk             ",
     "        kddddllldddlddddlllllddllllkkkkkllllllllllldddllddkkkkkkkkkkkkkkdlwwwkk            ",
     "        kddlllldddllddddlllllddldddddddkkldllllllllddlllddlllllllwwwwwkddlwwwwkk           ",
-    "        kdddllldddlddkkdllddddldddwwwwwwkkwwwwwwwwkddllddllllllllwwwwwkkdlwwwwwkk          ",
-    "        kdddllldddldkkkkdddlllddwwwwwwwwkkwwwwwwwwkddllddlllllllwwwwwwkkkkkkkkkkk          ",
-    "        kdddllldddldk  kddlllddwwwwwwwwwkkwwwwwwwwkklllddlllllllwwwwwwk                    ",
-    "         kkkkkkkkkkkk   kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk                    ",
+    "        kdddllldddldddddllddddldddwwwwwwkkwwwwwwwwkddllddllllllllwwwwwkkdlwwwwwkk          ",
+    "        kdddllldddlddddddddlllddwwwwwwwwkkwwwwwwwwkddllddlllllllwwwwwwkkkkkkkkkkk          ",
+    "        kdddllldddldddddddlllddwwwwwwwwwkkwwwwwwwwkklllddlllllllwwwwwwk                    ",
+    "        kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk                    ",
   ];
 
 
