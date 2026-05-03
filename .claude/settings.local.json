@@ -178,7 +178,12 @@
       "Bash(npm list *)",
       "Bash(curl -s 'https://api.vercel.com/v9/projects/prj_SUNRhO2102R2m4Z1ZB4FUrosAXwh/env?teamId=team_tvGjovENCUZ6riLzE6foHrEj' -H 'Authorization: Bearer vca_1yC1RGQZ5Y8LSF7J1GKpl9uSfslPFHt60X4QyqUgNhhmjxDt8D1B475E')",
       "Bash(python3 -m json.tool)",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({k:d.get\\(k\\) for k in ['readyState','errorMessage','errorCode','buildingAt','ready']}, indent=2\\)\\)\")"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({k:d.get\\(k\\) for k in ['readyState','errorMessage','errorCode','buildingAt','ready']}, indent=2\\)\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('nodeVersion:', d.get\\('nodeVersion'\\), '| error:', d.get\\('error'\\)\\)\")",
+      "Bash(cp -r /Users/christopherhowat/Documents/spotify-api /tmp/spotify-clean)",
+      "Bash(rm -rf /tmp/spotify-clean/.git /tmp/spotify-clean/.env.local /tmp/spotify-clean/.vercel)",
+      "Read(//tmp/**)"
     ]
   }
 }
