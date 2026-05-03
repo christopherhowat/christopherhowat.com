@@ -258,9 +258,9 @@
   const CANVAS_H = 90;
 
   // ── Timing ───────────────────────────────────────────────────────────
-  const FRAME_MS = 100;
-  const WALK_SPD = 3.5;
-  const SIT_MS   = 4000;
+  const FRAME_MS = 120;
+  const WALK_SPD = 2;
+  const SIT_MS   = 5000;
 
   // ── Draw helper (works for walk and sit frames) ───────────────────────
   function drawFrame (ctx, rows, scale) {
