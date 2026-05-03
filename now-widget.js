@@ -53,21 +53,21 @@
     strip.className = 'ticker-strip';
     for (let i = 0; i < COPIES; i++) {
       items.forEach(item => {
-        if (item.hidden) return;
         const el = item.key === 'spotify'
           ? document.createElement('a')
           : document.createElement('span');
         el.dataset.key = item.key;
         el.textContent = item.value;
-        if (item.key === 'spotify' && item.url) {
-          el.href = item.url;
-          el.target = '_blank';
-          el.rel = 'noopener noreferrer';
+        el.hidden = !!item.hidden;
+        if (item.key === 'spotify') {
+          if (item.url) { el.href = item.url; el.target = '_blank'; el.rel = 'noopener noreferrer'; }
         }
         strip.appendChild(el);
         const sep = document.createElement('span');
         sep.className = 'sep';
+        sep.dataset.sepFor = item.key;
         sep.textContent = '·';
+        sep.hidden = !!item.hidden;
         strip.appendChild(sep);
       });
     }
@@ -77,13 +77,14 @@
   function applyItems(strip, items) {
     items.forEach(item => {
       strip.querySelectorAll('[data-key="' + item.key + '"]').forEach(el => {
-        if (item.hidden) {
-          el.hidden = true;
-        } else {
-          el.hidden = false;
+        el.hidden = !!item.hidden;
+        if (!item.hidden) {
           el.textContent = item.value;
           if (item.key === 'spotify') el.href = item.url || '';
         }
+      });
+      strip.querySelectorAll('[data-sep-for="' + item.key + '"]').forEach(sep => {
+        sep.hidden = !!item.hidden;
       });
     });
   }
