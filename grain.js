@@ -1,5 +1,8 @@
 // Film grain — inline SVG with feTurbulence rect covering full viewport
+// Skipped on Safari: feTurbulence causes full-page repaints and compositing artefacts
 (function () {
+  const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+  if (isSafari) return;
   const NS = 'http://www.w3.org/2000/svg';
 
   const svg = document.createElementNS(NS, 'svg');

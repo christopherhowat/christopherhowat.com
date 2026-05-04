@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MH4YEG8SJZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MH4YEG8SJZ');
+  </script>
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CHANGE: title, description, and url -->
+  <meta property="og:title" content="ARTICLE TITLE - Christopher Howat">
+  <meta property="og:description" content="One sentence description of the article.">
+  <meta property="og:image" content="https://christopherhowat.com/images/og-image.png">
+  <meta property="og:url" content="https://christopherhowat.com/YOUR-FILENAME.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- CHANGE: title -->
+  <title>ARTICLE TITLE — Christopher Howat</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:ital,wght@0,300;0,400;0,500;1,300&display=swap"></noscript>
+  <link rel="stylesheet" href="project.css">
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#about" class="nav-link">About</a>
+    <a href="index.html#projects" class="nav-link active">Work</a>
+    <a href="index.html#experience" class="nav-link">Experience</a>
+    <a href="index.html#contact" class="nav-link">Contact</a>
+  </nav>
+
+  <div class="project-page">
+
+    <a href="index.html#projects" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      All Projects
+    </a>
+
+    <div class="project-header">
+      <!-- CHANGE: category · subcategory -->
+      <p class="project-eyebrow">Category · Subcategory</p>
+      <!-- CHANGE: article title -->
+      <h1 class="project-title">Article Title</h1>
+      <div class="project-meta">
+        <!-- CHANGE: add/remove tags as needed -->
+        <span class="meta-tag">Tag One</span>
+        <span class="meta-tag">Tag Two</span>
+        <span class="meta-tag">Tag Three</span>
+      </div>
+    </div>
+
+    <!-- CHANGE: hero image src and alt -->
+    <img
+      class="project-hero"
+      src="images/YOUR-HERO-IMAGE.webp"
+      alt="Description of hero image"
+    >
+
+    <div class="project-desc">
+      <!-- CHANGE: section heading -->
+      <h2>About the project</h2>
+      <!-- CHANGE: body paragraphs — add or remove <p> tags as needed -->
+      <p>
+        First paragraph. Introduce what this project or article is about.
+      </p>
+      <p>
+        Second paragraph. More detail, context, or your role.
+      </p>
+    </div>
+
+    <!-- OPTIONAL: delete this whole block if you have no gallery images -->
+    <div class="gallery">
+      <div class="gallery-item">
+        <img src="images/IMAGE-1.webp" alt="Description">
+      </div>
+      <div class="gallery-item">
+        <img src="images/IMAGE-2.webp" alt="Description">
+      </div>
+      <div class="gallery-item">
+        <img src="images/IMAGE-3.webp" alt="Description">
+      </div>
+      <div class="gallery-item">
+        <img src="images/IMAGE-4.webp" alt="Description">
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>© 2026 Christopher Howat</span>
+    <span>Glasgow, Scotland</span>
+  </footer>
+
+  <script src="trail.js"></script>
+  <script src="lightbox.js"></script>
+  <script src="grain.js"></script>
+  <script src="favicon-anim.js"></script>
+</body>
+</html>
