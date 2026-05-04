@@ -358,7 +358,7 @@
   const FRAME_MS        = 120;   // walk animation frame interval
   const BAT_FRAME_MS    = 80;    // each bat frame lasts this long
   const BAT_COOLDOWN_MS = 2000;  // ignore mouse for this long after batting
-  const WALK_SPD        = 180;   // px/sec at a 1000px-wide stage (scales with stage width)
+  const WALK_SPD        = 120;   // px/sec at a 1000px-wide stage (scales with stage width)
   const SIT_DIST        = 20;    // px — close enough to sit
   const ATTRACT_DIST    = 280;   // px — mouse must be within this to attract her
   const BAT_DIST        = 90;    // px — close enough to start swiping
