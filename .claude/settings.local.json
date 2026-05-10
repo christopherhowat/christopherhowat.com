@@ -185,7 +185,12 @@
       "Bash(rm -rf /tmp/spotify-clean/.git /tmp/spotify-clean/.env.local /tmp/spotify-clean/.vercel)",
       "Read(//tmp/**)",
       "Bash(git status *)",
-      "Bash(cat .gitignore)"
+      "Bash(cat .gitignore)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git rm *)",
+      "Bash(git commit *)",
+      "Bash(git mv *)"
     ]
   }
 }
