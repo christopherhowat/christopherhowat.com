@@ -5,7 +5,7 @@
 (function () {
 
   // ── Unified palette ──────────────────────────────────────────────────
-  const PALETTE = { k:'#000000', d:'#c4321d', l:'#e03b22', w:'#efefff' };
+  const PALETTE = { k:'#000000', d:'#db7b00', l:'#fca230', w:'#efefff' };
 
   // ── Walk frames (91×44 px source, quantised pixel art) ───────────────
   const WALK_SCALE = 2;
